@@ -12,11 +12,9 @@ End result in current version:
 
 ![image](https://user-images.githubusercontent.com/11204251/155899277-93522414-1009-49ed-b094-e3e856a27e88.png)
 
-## Profile
+## Profile Setup
 
-A large portion of the PSReadLine customizations found in the profile were modified from Scott Hanselman's profile Gist here: [shanselman/Microsoft.PowerShell_profile.ps1](https://gist.github.com/shanselman/25f5550ad186189e0e68916c6d7f44c3)
-
-## Required Modules
+### Required Modules
 
 I prefer to store modules under the AllUsers scope so those files are not constantly sync'd by OneDrive. The [init.ps1](init.ps1) script will handle a few things:
 
@@ -25,6 +23,18 @@ I prefer to store modules under the AllUsers scope so those files are not consta
 
 > Run the following command in an elevated PowerShell session
 
-```powershell
+```console
 .\init.ps1
+```
+
+### Modify PowerShell Profile
+
+> The PSReadLine customizations were modified from Scott Hanselman's profile Gist: [shanselman/Microsoft.PowerShell_profile.ps1](https://gist.github.com/shanselman/25f5550ad186189e0e68916c6d7f44c3)
+
+After running the init process above, open your PowerShell profile (e.g., `notepad $profile`), and add the line below.
+
+> Adjust the path based on where you cloned this repository to your local machine
+
+```console
+. c:\git\prompt\ps-profile.ps1
 ```
