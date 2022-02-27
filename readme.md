@@ -2,9 +2,13 @@
 
 This repository holds the files I use for initializing a new machine and my PowerShell prompt.
 
-## oh-my-posh
+## prompt
 
 The theme found in this repository was modified from Scott Hanselman's Gist here: [shanselman/ohmyposhv3-v2.json](https://gist.github.com/shanselman/1f69b28bfcc4f7716e49eb5bb34d7b2c)
+
+End result in current version:
+
+![image](https://user-images.githubusercontent.com/11204251/155899277-93522414-1009-49ed-b094-e3e856a27e88.png)
 
 ## Profile
 
