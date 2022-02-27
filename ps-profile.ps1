@@ -1,15 +1,23 @@
 $PSDefaultParameterValues = @{
-    "Install-Module:Scope"       = "AllUsers"
-    "Install-Module:Repository"  = "PSGallery"
+    "Install-Module:Scope"      = "AllUsers"
+    "Install-Module:Repository" = "PSGallery"
 }
 
-Import-Module oh-my-posh
-$ohMyPoshConfig = 'C:\git\prompt\oh-my-posh\oh-my-config.json'
-oh-my-posh --init --shell pwsh --config $ohMyPoshConfig | Invoke-Expression
+if (Get-Module oh-my-posh -ListAvailable) {
+    Import-Module oh-my-posh
+    $ohMyPoshConfig = 'C:\git\prompt\oh-my-posh\oh-my-config.json'
+    oh-my-posh --init --shell pwsh --config $ohMyPoshConfig | Invoke-Expression
+}
+
+if (Get-Module Terminal-Icons -ListAvailable) {
+    Import-Module Terminal-Icons
+}
 
 if ($psedition -ne 'Core') {
     [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12", "Tls11", "Tls", "Ssl3")
 }
+
+# my original prompt
 <#
 function Prompt {
     $major = $PSVersionTable.PSVersion.Major
@@ -56,7 +64,6 @@ function rdp {
     [cmdletbinding()]
     param (
         $server,
-        $username = 'smelton-a', #defaults to saved Secret for admin account
         [switch]$fullScreen
     )
     if ($fullScreen) {
@@ -71,7 +78,7 @@ function findshit ($str,$path) {
 }
 function Get-ClusterFailoverEvent {
     param([string]$Server)
-    Get-winEvent -ComputerName $Server -FilterHashTable @{LogName ='Microsoft-Windows-FailoverClustering/Operational'; Id=1641}
+    Get-WinEvent -ComputerName $Server -FilterHashtable @{LogName = 'Microsoft-Windows-FailoverClustering/Operational'; Id = 1641 }
 }
 function Find-MissingCommands {
     <#
