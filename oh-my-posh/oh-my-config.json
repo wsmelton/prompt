@@ -15,7 +15,7 @@
                     "powerline_symbol": "",
                     "invert_powerline": false,
                     "foreground": "#ffffff",
-                    "background": "#ff479c",
+                    "background": "#529e90",
                     "leading_diamond": "",
                     "trailing_diamond": "",
                     "properties": {
@@ -28,8 +28,8 @@
                     "style": "powerline",
                     "powerline_symbol": "",
                     "invert_powerline": false,
-                    "foreground": "#193549",
-                    "background": "#fffb38",
+                    "foreground": "#ffffff",
+                    "background": "#52869e",
                     "leading_diamond": "",
                     "trailing_diamond": "",
                     "properties": {
@@ -39,45 +39,15 @@
                     }
                 },
                 {
-                    "type": "dotnet",
-                    "style": "powerline",
-                    "powerline_symbol": "",
-                    "invert_powerline": false,
+                    "type": "executiontime",
+                    "style": "diamond",
+                    "leading_diamond": "<transparent,#529e6a>\ue0b0</>",
+                    "trailing_diamond": "\ue0b0",
                     "foreground": "#ffffff",
-                    "background": "#6CA35E",
-                    "leading_diamond": "",
-                    "trailing_diamond": "",
+                    "background": "#529e6a",
                     "properties": {
-                        "display_version": true,
-                        "prefix": "  "
-                    }
-                },
-                {
-                    "type": "root",
-                    "style": "powerline",
-                    "powerline_symbol": "",
-                    "invert_powerline": false,
-                    "foreground": "#ffffff",
-                    "background": "#ffff66",
-                    "leading_diamond": "",
-                    "trailing_diamond": "",
-                    "properties": null
-                },
-                {
-                    "type": "exit",
-                    "style": "powerline",
-                    "powerline_symbol": "",
-                    "invert_powerline": false,
-                    "foreground": "#ffffff",
-                    "background": "#2e9599",
-                    "leading_diamond": "",
-                    "trailing_diamond": "",
-                    "properties": {
-                        "always_enabled": true,
-                        "color_background": true,
-                        "display_exit_code": false,
-                        "error_color": "#f1184c",
-                        "prefix": " "
+                        "style": "austin",
+                        "threshold": 0
                     }
                 }
             ]
