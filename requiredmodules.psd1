@@ -1,58 +1,62 @@
 @{
     'oh-my-posh'                            = @{
-        Version    = "7.*"
-        Repository = "PSGallery"
+        Version    = '7.*'
+        Repository = 'PSGallery'
     }
     'posh-git'                              = @{
         Version    = '1.*'
-        Repository = "PSGallery"
+        Repository = 'PSGallery'
     }
     'Terminal-Icons'                        = @{
         Version    = '0.9*'
-        Repository = "PSGallery"
+        Repository = 'PSGallery'
+    }
+    z                                       = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
     }
     PSReadLine                              = @{
-        Version    = "2.*"
-        Repository = "PSGallery"
+        Version    = '2.*'
+        Repository = 'PSGallery'
     }
     PowerShellGet                           = @{
-        Version    = "3.*"
-        Repository = "PSGallery"
+        Version    = '3.*'
+        Repository = 'PSGallery'
     }
     ImportExcel                             = @{
-        Version    = "7.*"
-        Repository = "PSGallery"
+        Version    = '7.*'
+        Repository = 'PSGallery'
     }
     dbatools                                = @{
-        Version    = "1.*"
-        Repository = "PSGallery"
+        Version    = '1.*'
+        Repository = 'PSGallery'
     }
     Az                                      = @{
-        Version    = "7.*"
-        Repository = "PSGallery"
+        Version    = '7.*'
+        Repository = 'PSGallery'
     }
     Pester                                  = @{
-        Version    = "[5.3.0,6.0)"
-        Repository = "PSGallery"
+        Version    = '[5.3.0,6.0)'
+        Repository = 'PSGallery'
     }
     'PSRule.Rules.Azure'                    = @{
-        Version    = "[1.9.1]"
-        Repository = "PSGallery"
+        Version    = '[1.9.1]'
+        Repository = 'PSGallery'
     }
     PSRule                                  = @{
-        Version    = "[1.9.0]"
-        Repository = "PSGallery"
+        Version    = '[1.9.0]'
+        Repository = 'PSGallery'
     }
     InvokeBuild                             = @{
-        Version    = "5.*"
-        Repository = "PSGallery"
+        Version    = '5.*'
+        Repository = 'PSGallery'
     }
     'Microsoft.PowerShell.SecretManagement' = @{
-        Version    = "1.*"
-        Repository = "PSGallery"
+        Version    = '1.*'
+        Repository = 'PSGallery'
     }
     'Microsoft.PowerShell.SecretStore'      = @{
-        Version    = "1.*"
-        Repository = "PSGallery"
+        Version    = '1.*'
+        Repository = 'PSGallery'
     }
 }
