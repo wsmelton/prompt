@@ -1,0 +1,2 @@
+# ignore the backup file created for oh-my-posh
+oh-my-posh/*.json.bak
