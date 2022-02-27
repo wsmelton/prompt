@@ -4,7 +4,9 @@ This repository holds the files I use for initializing a new machine and my Powe
 
 ## prompt
 
-The theme found in this repository was modified from Scott Hanselman's Gist here: [shanselman/ohmyposhv3-v2.json](https://gist.github.com/shanselman/1f69b28bfcc4f7716e49eb5bb34d7b2c)
+The theme for [oh-my-posh](https://ohmyposh.dev) can be found in the [oh-my-config.json](oh-my-config.json) file.
+
+> This file is modified from Scott Hanselman's Gist here: [shanselman/ohmyposhv3-v2.json](https://gist.github.com/shanselman/1f69b28bfcc4f7716e49eb5bb34d7b2c)
 
 End result in current version:
 

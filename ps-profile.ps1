@@ -8,7 +8,7 @@ $PSDefaultParameterValues = @{
 
 if (Get-Module oh-my-posh -ListAvailable) {
     Import-Module oh-my-posh
-    $ohMyPoshConfigOriginal = 'C:\git\prompt\oh-my-posh\oh-my-config.json'
+    $ohMyPoshConfigOriginal = 'C:\git\prompt\oh-my-config.json'
     $ohMyPoshConfig = "$env:userprofile\oh-my-config.json"
     try {
         if (Test-Path $ohMyPoshConfig) {
