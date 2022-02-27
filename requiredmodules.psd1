@@ -23,6 +23,10 @@
         Version    = '3.*'
         Repository = 'PSGallery'
     }
+    PSProfile                               = @{
+        Version    = '0.7*'
+        Repository = 'PSGallery'
+    }
     ImportExcel                             = @{
         Version    = '7.*'
         Repository = 'PSGallery'
