@@ -11,6 +11,14 @@ if (Get-Module oh-my-posh -ListAvailable) {
     $ohMyPoshConfigOriginal = 'C:\git\prompt\oh-my-posh\oh-my-config.json'
     $ohMyPoshConfig = "$env:userprofile\oh-my-config.json"
     try {
+        if (Test-Path $ohMyPoshConfig) {
+            Remove-Item $ohMyPoshConfig -Force
+            # make sure to remove the backup file as well
+            $bak = "$ohMyPoshConfig.bak"
+            if (Test-Path $bak) {
+                Remove-Item $bak -Force
+            }
+        }
         Copy-Item $ohMyPoshConfigOriginal $ohMyPoshConfig -Force
     } catch {
         Write-Warning "Unable to write oh-my-posh profile to $ohMyPoshConfig -- $($_)"
@@ -25,12 +33,13 @@ if (Get-Module Terminal-Icons -ListAvailable) {
 #region PSReadLine
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 Set-PSReadLineOption -EditMode Windows
+
+# you can use Get-PSReadLineKeyHandler to pull the list of these
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchBackward
-
-[scriptblock]$psReadLineHistoryScriptBlock = @{
+Set-PSReadLineKeyHandler -Key F7 -BriefDescription History -LongDescription 'Show command history' -ScriptBlock {
     $pattern = $null
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$pattern, [ref]$null)
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$pattern,[ref]$null)
     if ($pattern) {
         $pattern = [regex]::Escape($pattern)
     }
@@ -43,8 +52,7 @@ Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchBackward
                 $line = $line.Substring(0, $line.Length - 1)
                 $lines = if ($lines) {
                     "$lines`n$line"
-                }
-                else {
+                } else {
                     $line
                 }
                 continue
@@ -69,9 +77,8 @@ Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchBackward
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert(($command -join "`n"))
     }
 }
-Set-PSReadLineKeyHandler -Key F7 -BriefDescription History -LongDescription 'Show command history' -ScriptBlock $psReadLineHistoryScriptBlock
 
-[scriptblock]$psReadLineMatchingBraces = @{
+Set-PSReadLineKeyHandler -Key ')',']','}' -BriefDescription SmartCloseBraces -LongDescription 'Insert closing braces or skip' -ScriptBlock {
     param($key, $arg)
 
     $closeChar = switch ($key.KeyChar) {
@@ -98,23 +105,20 @@ Set-PSReadLineKeyHandler -Key F7 -BriefDescription History -LongDescription 'Sho
         [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($cursor + 1)
     }
 }
-Set-PSReadLineKeyHandler -Key ')',']','}' -BriefDescription SmartCloseBraces -LongDescription 'Insert closing braces or skip' -ScriptBlock $psReadLineMatchingBraces
 
-[scriptblock]$psReadLineSmartBackspace = @{
-    param($key, $arg)
+# Set-PSReadLineKeyHandler -Key Backspace -BriefDescription SmartBackspace -LongDescription "Delete previous character or matching quotes/parens/braces" -ScriptBlock {
+#     param($key, $arg)
 
-    $line = $null
-    $cursor = $null
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+#     $line = $null
+#     $cursor = $null
+#     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
 
-    if ($line[$cursor] -eq $key.KeyChar) {
-        [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($cursor + 1)
-    }
-    else {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert("$($key.KeyChar)")
-    }
-}
-Set-PSReadLineKeyHandler -Key Backspace -BriefDescription SmartBackspace -LongDescription "Delete previous character or matching quotes/parens/braces" -ScriptBlock $psReadLineSmartBackspace
+#     if ($line[$cursor] -eq $key.KeyChar) {
+#         [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($cursor + 1)
+#     } else {
+#         [Microsoft.PowerShell.PSConsoleReadLine]::Insert("$($key.KeyChar)")
+#     }
+# }
 
 # forgot something on command, add it to history to reuse later via up arrow
 Set-PSReadLineKeyHandler -Key Alt+w `
@@ -153,7 +157,7 @@ if ($psedition -ne 'Core') {
     [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12", "Tls11", "Tls", "Ssl3")
 }
 
-# my original prompt
+# non-PSReadLine version of the same prompt
 <#
 function Prompt {
     $major = $PSVersionTable.PSVersion.Major
