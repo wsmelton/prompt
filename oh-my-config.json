@@ -71,8 +71,12 @@
       "type": "prompt"
     }
   ],
+  "secondary_prompt": {
+    "background": "transparent",
+    "foreground": "#CD4277",
+    "template": " > "
+  },
   "console_title": true,
   "console_title_style": "folder",
-  "final_space": true,
   "version": 1
 }
