@@ -8,21 +8,7 @@ $PSDefaultParameterValues = @{
 
 if (Get-Module oh-my-posh -ListAvailable) {
     Import-Module oh-my-posh
-    $ohMyPoshConfigOriginal = 'C:\git\prompt\oh-my-config.json'
-    $ohMyPoshConfig = "$env:userprofile\oh-my-config.json"
-    try {
-        if (Test-Path $ohMyPoshConfig) {
-            Remove-Item $ohMyPoshConfig -Force
-            # make sure to remove the backup file as well
-            $bak = "$ohMyPoshConfig.bak"
-            if (Test-Path $bak) {
-                Remove-Item $bak -Force
-            }
-        }
-        Copy-Item $ohMyPoshConfigOriginal $ohMyPoshConfig -Force
-    } catch {
-        Write-Warning "Unable to write oh-my-posh profile to $ohMyPoshConfig -- $($_)"
-    }
+    $ohMyPoshConfig = 'https://raw.githubusercontent.com/wsmelton/prompt/main/oh-my-config.json'
     oh-my-posh --init --shell pwsh --config $ohMyPoshConfig | Invoke-Expression
 }
 
