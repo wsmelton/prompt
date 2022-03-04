@@ -39,6 +39,10 @@
         Version    = '7.*'
         Repository = 'PSGallery'
     }
+    AzureAD                                 = @{
+        Version    = '2.*'
+        Repository = 'PSGallery'
+    }
     Pester                                  = @{
         Version    = '[5.3.0,6.0)'
         Repository = 'PSGallery'
