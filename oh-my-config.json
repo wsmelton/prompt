@@ -6,6 +6,7 @@
         {
             "type": "prompt",
             "alignment": "left",
+            "newline": true,
             "horizontal_offset": 0,
             "vertical_offset": 0,
             "segments": [
@@ -51,6 +52,29 @@
                     }
                 }
             ]
+        },
+        {
+            "alignment": "left",
+            "newline": true,
+            "segments": [
+                {
+                    "foreground": "#cd5e42",
+                    "properties": {
+                        "template": "\ue3bf "
+                    },
+                    "style": "plain",
+                    "type": "root"
+                },
+                {
+                    "foreground": "#CD4277",
+                    "properties": {
+                        "template": "> "
+                    },
+                    "style": "plain",
+                    "type": "text"
+                }
+            ],
+            "type": "prompt"
         }
     ]
 }
