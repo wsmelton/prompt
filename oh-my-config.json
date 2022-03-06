@@ -1,82 +1,82 @@
 {
-  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
-  "blocks": [
-    {
-      "alignment": "left",
-      "newline": true,
-      "segments": [
+    "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+    "blocks": [
         {
-          "background": "#529e90",
-          "foreground": "#ffffff",
-          "leading_diamond": "\ue0b6",
-          "powerline_symbol": "\ue0b0",
-          "properties": {
-            "style": "folder",
-            "template": " \ue5ff {{ .Path }} "
-          },
-          "style": "diamond",
-          "trailing_diamond": "\ue0b0",
-          "type": "path"
+            "alignment": "left",
+            "newline": true,
+            "segments": [
+                {
+                    "background": "#529e90",
+                    "foreground": "#ffffff",
+                    "leading_diamond": "\ue0b6",
+                    "powerline_symbol": "\ue0b0",
+                    "properties": {
+                        "style": "folder",
+                        "template": " \ue5ff {{ .Path }} "
+                    },
+                    "style": "diamond",
+                    "trailing_diamond": "\ue0b0",
+                    "type": "path"
+                },
+                {
+                    "background": "#52869e",
+                    "foreground": "#ffffff",
+                    "powerline_symbol": "\ue0b0",
+                    "properties": {
+                        "fetch_stash_count": true,
+                        "fetch_status": true,
+                        "fetch_upstream_icon": true,
+                        "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}} \uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} "
+                    },
+                    "style": "powerline",
+                    "type": "git"
+                },
+                {
+                    "background": "#529e6a",
+                    "foreground": "#ffffff",
+                    "leading_diamond": "<transparent,#529e6a>\ue0b0</>",
+                    "properties": {
+                        "style": "austin",
+                        "template": " {{ .FormattedMs }} ",
+                        "threshold": 0
+                    },
+                    "style": "diamond",
+                    "trailing_diamond": "\ue0b0",
+                    "type": "executiontime"
+                }
+            ],
+            "type": "prompt"
         },
         {
-          "background": "#52869e",
-          "foreground": "#ffffff",
-          "powerline_symbol": "\ue0b0",
-          "properties": {
-            "fetch_stash_count": true,
-            "fetch_status": true,
-            "fetch_upstream_icon": true,
-            "template": " {{ .HEAD }} {{ .BranchStatus }}{{ if .Working.Changed }} \uf044 {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }} \uf046 {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0}} \uf692 {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0}} \uf1bb {{ .WorktreeCount }}{{ end }} "
-          },
-          "style": "powerline",
-          "type": "git"
-        },
-        {
-          "background": "#529e6a",
-          "foreground": "#ffffff",
-          "leading_diamond": "<transparent,#529e6a>\ue0b0</>",
-          "properties": {
-            "style": "austin",
-            "template": " {{ .FormattedMs }} ",
-            "threshold": 0
-          },
-          "style": "diamond",
-          "trailing_diamond": "\ue0b0",
-          "type": "executiontime"
+            "alignment": "left",
+            "newline": true,
+            "segments": [
+                {
+                    "foreground": "#cd5e42",
+                    "properties": {
+                        "template": " \ue3bf "
+                    },
+                    "style": "plain",
+                    "type": "root"
+                },
+                {
+                    "foreground": "#CD4277",
+                    "properties": {
+                        "template": " > "
+                    },
+                    "style": "plain",
+                    "type": "text"
+                }
+            ],
+            "type": "prompt"
         }
-      ],
-      "type": "prompt"
+    ],
+    "secondary_prompt": {
+        "background": "transparent",
+        "foreground": "#CD4277",
+        "template": " > "
     },
-    {
-      "alignment": "left",
-      "newline": true,
-      "segments": [
-        {
-          "foreground": "#cd5e42",
-          "properties": {
-            "template": " \ue3bf "
-          },
-          "style": "plain",
-          "type": "root"
-        },
-        {
-          "foreground": "#CD4277",
-          "properties": {
-            "template": " > "
-          },
-          "style": "plain",
-          "type": "text"
-        }
-      ],
-      "type": "prompt"
-    }
-  ],
-  "secondary_prompt": {
-    "background": "transparent",
-    "foreground": "#CD4277",
-    "template": " > "
-  },
-  "console_title": true,
-  "console_title_style": "folder",
-  "version": 1
+    "console_title": true,
+    "console_title_style": "folder",
+    "version": 1
 }
