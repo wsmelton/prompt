@@ -27,7 +27,9 @@ if ($psedition -ne 'Core') {
     [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12", "Tls11", "Tls", "Ssl3")
 }
 
-$azContextImport = "$env:USERPROFILE\azure-context.json"
+if (Get-Module Az.Accounts -ListAvailable) {
+    $azContextImport = "$env:USERPROFILE\azure-context.json"
+}
 
 # non-PSReadLine version of the same prompt
 <#
@@ -164,7 +166,7 @@ function Reset-Az {
 #Import-Module Az.Tools.Predictor
 #Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
-if (Test-Path $azContextImport) {
+if (Test-Path $azContextImport -and (Get-Module Az.Accounts -ListAvailable)) {
     $data = Get-Content $azContextImport | ConvertFrom-Json -Depth 100
     if ($data.Contexts.Count -gt 1) {
         Import-AzContext -Path $azContextImport
