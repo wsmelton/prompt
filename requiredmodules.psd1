@@ -35,6 +35,10 @@
         Version    = '1.*'
         Repository = 'PSGallery'
     }
+    Bicep                                   = @{
+        Version    = '2.*'
+        Repository = 'PSGallery'
+    }
     Az                                      = @{
         Version    = '7.*'
         Repository = 'PSGallery'
