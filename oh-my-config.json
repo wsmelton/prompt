@@ -11,8 +11,10 @@
                     "leading_diamond": "\ue0b6",
                     "powerline_symbol": "\ue0b0",
                     "properties": {
-                        "style": "folder",
-                        "template": " \ue5ff {{ .Path }} "
+                        "style": "full",
+                        "folder_separator_icon": "\\",
+                        "max_depth": 2,
+                        "hide_root_location": true
                     },
                     "style": "diamond",
                     "trailing_diamond": "\ue0b0",
@@ -52,7 +54,7 @@
             "newline": true,
             "segments": [
                 {
-                    "foreground": "#cd5e42",
+                    "foreground": "#dd5a39",
                     "properties": {
                         "template": " \ue3bf "
                     },
@@ -60,7 +62,7 @@
                     "type": "root"
                 },
                 {
-                    "foreground": "#CD4277",
+                    "foreground": "#2354d9",
                     "properties": {
                         "template": " > "
                     },
@@ -73,7 +75,7 @@
     ],
     "secondary_prompt": {
         "background": "transparent",
-        "foreground": "#CD4277",
+        "foreground": "#ea0d0d",
         "template": " > "
     },
     "console_title": true,
