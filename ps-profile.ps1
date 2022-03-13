@@ -247,7 +247,7 @@ function Revoke-DomainToken {
 #Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
 if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
-    $data = Get-Content $azContextImport | ConvertFrom-Json -Depth 100
+    $data = Get-Content $azContextImport | ConvertFrom-Json
     if ($data.Contexts.Count -gt 1) {
         Import-AzContext -Path $azContextImport
     }
