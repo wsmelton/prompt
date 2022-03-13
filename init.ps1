@@ -1,8 +1,18 @@
-if (-not (Get-InstalledScript Install-RequiredModule)) {
-    try {
-        Install-Script Install-RequiredModule -Repository PSGallery -Force
-    } catch {
-        throw "Issue installed dependency: Install-RequiredModule script: $($_)"
+if ($psedition -eq 'Core') {
+    if (-not (Get-InstalledScript Install-RequiredModule)) {
+        try {
+            Install-Script Install-RequiredModule -Repository PSGallery -Force
+        } catch {
+            throw "Issue installed dependency: Install-RequiredModule script: $($_)"
+        }
+    }
+} else {
+    if (-not (Get-PSResource Install-RequiredModule)) {
+        try {
+            Install-PSresource Install-RequiredModule -Repository PSGallery -Force
+        } catch {
+            throw "Issue installed dependency: Install-RequiredModule script: $($_)"
+        }
     }
 }
 
