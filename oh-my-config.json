@@ -11,10 +11,9 @@
                     "leading_diamond": "\ue0b6",
                     "powerline_symbol": "\ue0b0",
                     "properties": {
-                        "style": "full",
+                        "style": "agnoster_short",
                         "folder_separator_icon": "\\",
-                        "max_depth": 2,
-                        "hide_root_location": true
+                        "max_depth": 3
                     },
                     "style": "diamond",
                     "trailing_diamond": "\ue0b0",
