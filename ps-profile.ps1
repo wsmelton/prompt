@@ -1,6 +1,9 @@
 using namespace System.Management.Automation
 using namespace System.Management.Automation.Language
 
+# improve speed of downloads by turning off progress bar
+$ProgressPreference = 'SilentlyContinue'
+
 $PSDefaultParameterValues = @{
     "Install-Module:Scope"      = "AllUsers"
     "Install-Module:Repository" = "PSGallery"
@@ -193,6 +196,26 @@ function Revoke-DomainToken {
         }
     }
     process {
+        try {
+            if ($psedition -eq 'Core') {
+                Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
+            } else {
+                Import-Module ActiveDirectory -ErrorAction Stop
+            }
+        } catch {
+            throw "Issue loading ActiveDirectory Module: $($_)"
+        }
+
+        try {
+            if ($psedition -eq 'Core') {
+                Import-Module AzureAD -UseWindowsPowerShell -ErrorAction Stop
+            } else {
+                Import-Module AzureAD -ErrorAction Stop
+            }
+        } catch {
+            throw "Issue loading AzureAD Module: $($_)"
+        }
+
         if ($PSCmdlet.ShouldProcess($justUsername,'Disabling Active Directory Identity')) {
             try {
                 if (Get-ADUser -Identity $justUsername -Credential $ADCredential -ErrorAction SilentlyContinue) {
@@ -215,16 +238,13 @@ function Revoke-DomainToken {
             }
         }
         try {
-            if ($psedition -eq 'Core') {
-                Import-Module AzureAD -UseWindowsPowerShell -ErrorAction Stop
-                Connect-AzureAD
-            } else {
-                Import-Module AzureAD -ErrorAction Stop
-                Connect-AzureAD
-            }
+            Get-AzureADTenantDetail -ErrorAction Stop >$null
+            Write-Host 'Connected to Azure AD'
         } catch {
-            throw "Issue loading and logging into AzureAD: $($_)"
+            Write-Warning "No active connection found to Azure AD"
+            Connect-AzureAD
         }
+
         if ($PSCmdlet.ShouldProcess($Identity,'Disabling Azure AD Identity')) {
             try {
                 Set-AzureADUser -ObjectId $Identity -AccountEnabled $false -ErrorAction Stop
