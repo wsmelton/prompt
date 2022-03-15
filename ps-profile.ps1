@@ -242,7 +242,7 @@ function Revoke-DomainToken {
             Write-Host 'Connected to Azure AD'
         } catch {
             Write-Warning "No active connection found to Azure AD"
-            Connect-AzureAD
+            Connect-AzureAD >$null
         }
 
         if ($PSCmdlet.ShouldProcess($Identity,'Disabling Azure AD Identity')) {
