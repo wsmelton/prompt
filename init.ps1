@@ -7,9 +7,9 @@ if ($psedition -eq 'Core') {
         }
     }
 } else {
-    if (-not (Get-PSResource Install-RequiredModule)) {
+    if (-not (Get-Module Install-RequiredModule)) {
         try {
-            Install-PSresource Install-RequiredModule -Repository PSGallery -Force
+            Install-Module Install-RequiredModule -Repository PSGallery -Force
         } catch {
             throw "Issue installed dependency: Install-RequiredModule script: $($_)"
         }

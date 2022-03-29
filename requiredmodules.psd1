@@ -20,7 +20,7 @@
         Repository = 'PSGallery'
     }
     PowerShellGet                           = @{
-        Version    = '3.*'
+        Version    = '2.*'
         Repository = 'PSGallery'
     }
     PSProfile                               = @{
@@ -39,8 +39,24 @@
         Version    = '2.*'
         Repository = 'PSGallery'
     }
-    Az                                      = @{
-        Version    = '7.*'
+    'Az.Accounts'                           = @{
+        Version    = '2.7.3'
+        Repository = 'PSGallery'
+    }
+    'Az.Compute'                            = @{
+        Version    = '4.23.0'
+        Repository = 'PSGallery'
+    }
+    'Az.Network'                            = @{
+        Version    = '4.14.0'
+        Repository = 'PSGallery'
+    }
+    'Az.Storage'                            = @{
+        Version    = '4.2.0'
+        Repository = 'PSGallery'
+    }
+    'Az.ContainerRegistry'                  = @{
+        Version    = '2.2.3'
         Repository = 'PSGallery'
     }
     AzureAD                                 = @{
