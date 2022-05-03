@@ -59,6 +59,10 @@
         Version    = '2.2.3'
         Repository = 'PSGallery'
     }
+    'Az.RecoveryServices'                  = @{
+        Version    = '4.4.0'
+        Repository = 'PSGallery'
+    }
     AzureAD                                 = @{
         Version    = '2.*'
         Repository = 'PSGallery'
@@ -84,6 +88,10 @@
         Repository = 'PSGallery'
     }
     'Microsoft.PowerShell.SecretStore'      = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
+    }
+    'AkamaiPowerShell'      = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
