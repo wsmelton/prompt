@@ -59,6 +59,10 @@
         Version    = '2.2.3'
         Repository = 'PSGallery'
     }
+    'Az.CostManagement'                     = @{
+        Version    = '0.2.*'
+        Repository = 'PSGallery'
+    }
     'Az.RecoveryServices'                  = @{
         Version    = '4.4.0'
         Repository = 'PSGallery'
