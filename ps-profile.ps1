@@ -300,7 +300,7 @@ filter Get-AcrTag {
     $Repositories = $global:AzContainerRegistryRepositoryCache[$RegistryName] -match "($($name -join '|'))$"
     foreach ($repo in $Repositories) {
         Write-Verbose "Fetching version tags for $repo"
-        foreach($registry in Get-AzContainerRegistryTag -RegistryName crbicepazusw2dvorprd -RepositoryName $repo -ea 0) {
+        foreach ($registry in Get-AzContainerRegistryTag -RegistryName $azContainerRegistry -RepositoryName $repo -ea 0) {
             # Sort the tags the opposite direction
             $registry.Tags.Sort( { -1 * $args[0].LastUpdateTime.CompareTo($args[1].LastUpdateTime) } )
             $registry
@@ -326,6 +326,56 @@ function Set-Subscription {
         if ($result.Name -eq $SubName) {
             Write-Host "Context switched to subscription: [$SubName]" -ForegroundColor DarkCyan
         }
+    }
+}
+function Search-LDMailboxAuditLog {
+    <#
+    Source: https://docs.microsoft.com/en-us/office365/troubleshoot/audit-logs/mailbox-audit-logs
+    #>
+    param ([PARAMETER(Mandatory = $TRUE,ValueFromPipeline = $FALSE)]
+        [string]$Mailbox,
+        [PARAMETER(Mandatory = $TRUE,ValueFromPipeline = $FALSE)]
+        [string]$StartDate,
+        [PARAMETER(Mandatory = $TRUE,ValueFromPipeline = $FALSE)]
+        [string]$EndDate,
+        [PARAMETER(Mandatory = $FALSE,ValueFromPipeline = $FALSE)]
+        [string]$Subject,
+        [PARAMETER(Mandatory = $False,ValueFromPipeline = $FALSE)]
+        [switch]$IncludeFolderBind,
+        [PARAMETER(Mandatory = $False,ValueFromPipeline = $FALSE)]
+        [switch]$ReturnObject)
+    begin {
+        [string[]]$LogParameters = @('Operation', 'LogonUserDisplayName', 'LastAccessed', 'DestFolderPathName', 'FolderPathName', 'ClientInfoString', 'ClientIPAddress', 'ClientMachineName', 'ClientProcessName', 'ClientVersion', 'LogonType', 'MailboxResolvedOwnerName', 'OperationResult')
+    }
+    end {
+        if ($ReturnObject)
+        { return $SearchResults }
+        elseif ($SearchResults.count -gt 0) {
+            $Date = Get-Date -Format 'yyMMdd_HHmmss'
+            $OutFileName = "AuditLogResults$Date.csv"
+            Write-Host
+            Write-Host -fore green "Posting results to file: $OutfileName"
+            $SearchResults | Export-Csv $OutFileName -NoTypeInformation -Encoding UTF8
+        }
+    }
+    PROCESS {
+        Write-Host -fore green 'Searching Mailbox Audit Logs...'
+        $SearchResults = @(Search-MailboxAuditLog $Mailbox -StartDate $StartDate -EndDate $EndDate -LogonTypes Owner,Admin,Delegate -ShowDetails -resultsize 50000)
+        Write-Host -fore green '$($SearchREsults.Count) Total entries Found'
+        if (-not $IncludeFolderBind) {
+            Write-Host -fore green 'Removing FolderBind operations.'
+            $SearchResults = @($SearchResults | ForEach-Object { $_.Operation -notlike 'FolderBind' })
+            Write-Host -fore green 'Filtered to $($SearchREsults.Count) Entries'
+        }
+        $SearchResults = @($SearchResults | Select-Object ($LogParameters + @{Name = 'Subject';e = { if (($_.SourceItems.Count -eq 0) -or ($null -eq $_.SourceItems.Count)) { $_.ItemSubject } else { ($_.SourceItems[0].SourceItemSubject).TrimStart(' ') } } },
+                @{Name = 'CrossMailboxOp';e = { if (@('SendAs','Create','Update') -contains $_.Operation) { 'N/A' } else { $_.CrossMailboxOperation } } }))
+        $LogParameters = @('Subject') + $LogParameters + @('CrossMailboxOp')
+        If ($Subject -ne '' -and $Subject -ne $null) {
+            Write-Host -fore green 'Searching for Subject: $Subject'
+            $SearchResults = @($SearchResults | ForEach-Object { $_.Subject -match $Subject -or $_.Subject -eq $Subject })
+            Write-Host -fore green 'Filtered to $($SearchREsults.Count) Entries'
+        }
+        $SearchResults = @($SearchResults | Select-Object $LogParameters)
     }
 }
 #endregion functions
