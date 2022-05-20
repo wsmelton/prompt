@@ -1,101 +1,105 @@
 @{
-    'oh-my-posh'                            = @{
+    'oh-my-posh'                                   = @{
         Version    = '7.*'
         Repository = 'PSGallery'
     }
-    'posh-git'                              = @{
+    'posh-git'                                     = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
-    'Terminal-Icons'                        = @{
+    'Terminal-Icons'                               = @{
         Version    = '0.9*'
         Repository = 'PSGallery'
     }
-    z                                       = @{
+    z                                              = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
-    PSReadLine                              = @{
+    PSReadLine                                     = @{
         Version    = '2.*'
         Repository = 'PSGallery'
     }
-    PowerShellGet                           = @{
+    PowerShellGet                                  = @{
         Version    = '2.*'
         Repository = 'PSGallery'
     }
-    PSProfile                               = @{
+    PSProfile                                      = @{
         Version    = '0.7*'
         Repository = 'PSGallery'
     }
-    ImportExcel                             = @{
+    ImportExcel                                    = @{
         Version    = '7.*'
         Repository = 'PSGallery'
     }
-    dbatools                                = @{
+    dbatools                                       = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
-    Bicep                                   = @{
+    Bicep                                          = @{
         Version    = '2.*'
         Repository = 'PSGallery'
     }
-    'Az.Accounts'                           = @{
+    'Az.Accounts'                                  = @{
         Version    = '2.7.3'
         Repository = 'PSGallery'
     }
-    'Az.Compute'                            = @{
+    'Az.Compute'                                   = @{
         Version    = '4.23.0'
         Repository = 'PSGallery'
     }
-    'Az.Network'                            = @{
+    'Az.Network'                                   = @{
         Version    = '4.14.0'
         Repository = 'PSGallery'
     }
-    'Az.Storage'                            = @{
+    'Az.Storage'                                   = @{
         Version    = '4.2.0'
         Repository = 'PSGallery'
     }
-    'Az.ContainerRegistry'                  = @{
+    'Az.ContainerRegistry'                         = @{
         Version    = '2.2.3'
         Repository = 'PSGallery'
     }
-    'Az.CostManagement'                     = @{
+    'Az.CostManagement'                            = @{
         Version    = '0.2.*'
         Repository = 'PSGallery'
     }
-    'Az.RecoveryServices'                  = @{
+    'Az.RecoveryServices'                          = @{
         Version    = '4.4.0'
         Repository = 'PSGallery'
     }
-    AzureAD                                 = @{
+    AzureAD                                        = @{
         Version    = '2.*'
         Repository = 'PSGallery'
     }
-    Pester                                  = @{
+    'Microsoft.Azure.ActiveDirectory.PIM.PSModule' = @{
+        Version    = '2.*'
+        Repository = 'PSGallery'
+    }
+    Pester                                         = @{
         Version    = '[5.3.0,6.0)'
         Repository = 'PSGallery'
     }
-    'PSRule.Rules.Azure'                    = @{
+    'PSRule.Rules.Azure'                           = @{
         Version    = '[1.9.1]'
         Repository = 'PSGallery'
     }
-    PSRule                                  = @{
+    PSRule                                         = @{
         Version    = '[1.9.0]'
         Repository = 'PSGallery'
     }
-    InvokeBuild                             = @{
+    InvokeBuild                                    = @{
         Version    = '5.*'
         Repository = 'PSGallery'
     }
-    'Microsoft.PowerShell.SecretManagement' = @{
+    'Microsoft.PowerShell.SecretManagement'        = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
-    'Microsoft.PowerShell.SecretStore'      = @{
+    'Microsoft.PowerShell.SecretStore'             = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
-    'AkamaiPowerShell'      = @{
+    'AkamaiPowerShell'                             = @{
         Version    = '1.*'
         Repository = 'PSGallery'
     }
