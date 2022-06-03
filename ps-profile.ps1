@@ -24,6 +24,9 @@ if (Get-Module Terminal-Icons -ListAvailable) {
     Import-Module Terminal-Icons
 }
 
+if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core')) {
+    Import-Module AzureAD -UseWindowsPowerShell -WarningAction SilentlyContinue
+}
 #region PSReadLine
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 #endregion PSReadLine
@@ -326,6 +329,40 @@ function Set-Subscription {
         if ($result.Name -eq $SubName) {
             Write-Host "Context switched to subscription: [$SubName]" -ForegroundColor DarkCyan
         }
+    }
+}
+function Enable-PimRole {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory,POsition = 0)]
+        [string]
+        $RoleName,
+
+        [string]
+        $Reason,
+
+        [string]
+        $Ticket,
+
+        [int]
+        $Duration = 8,
+
+        [switch]
+        $ShowActive
+    )
+    begin {
+        if ($psedition) { throw 'This function can only be used in Windows PowerShell'}
+        try {
+            $azAdSessionInfo = Get-AzureADCurrentSessionInfo -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
+            $tenantId = $azAdSessionInfo.TenantId
+        } catch {
+            Connect-AzureAD
+            $tenantId = (Get-AzureADCurrentSessionInfo).TenantId
+        }
+    }
+    process {
+        $providerId = 'aadRoles'
+
     }
 }
 #endregion functions

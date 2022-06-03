@@ -27,6 +27,10 @@
         Version    = '0.7*'
         Repository = 'PSGallery'
     }
+    PSBicep                                        = @{
+        Version    = '2.2*'
+        Repository = 'PSGallery'
+    }
     ImportExcel                                    = @{
         Version    = '7.*'
         Repository = 'PSGallery'
@@ -101,6 +105,10 @@
     }
     'AkamaiPowerShell'                             = @{
         Version    = '1.*'
+        Repository = 'PSGallery'
+    }
+    'CredentialManager'                            = @{
+        Version    = '2.*'
         Repository = 'PSGallery'
     }
 }
