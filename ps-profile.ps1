@@ -11,6 +11,11 @@ $PSDefaultParameterValues = @{
     "Install-Module:Repository" = "PSGallery"
 }
 
+if (Get-Module ImportExcel -List) {
+    $PSDefaultParameterValues.Add('Export-Excel:FreezeTopRow',$true)
+    $PSDefaultParameterValues.Add('Export-Excel:BoldTopRow',$true)
+    $PSDefaultParameterValues.Add('Export-Excel:TableStyle','Light14')
+}
 $ohMyPoshModule = Get-Module -Name oh-my-posh -ListAvailable | Select-Object -First 1
 if ($ohMyPoshModule.Version.Major -ge 7 -and $ohMyPoshModule.Version.Minor -ge 30) {
     Import-Module oh-my-posh
@@ -351,7 +356,7 @@ function Enable-PimRole {
         $ShowActive
     )
     begin {
-        if ($psedition) { throw 'This function can only be used in Windows PowerShell'}
+        if ($psedition) { throw 'This function can only be used in Windows PowerShell' }
         try {
             $azAdSessionInfo = Get-AzureADCurrentSessionInfo -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
             $tenantId = $azAdSessionInfo.TenantId
@@ -375,34 +380,36 @@ function Get-AzureAddressSpace {
             throw "Issue getting list of Subscriptions: $($_)"
         }
         if ($subscriptions) {
-            $subscriptions | Foreach-Object -ThrottleLimit 10 -Parallel {
+            $subscriptions | ForEach-Object -ThrottleLimit 10 -Parallel {
                 $subName = $_.Name
                 $azContext = Get-AzContext -WarningAction SilentlyContinue
                 if ($azContext -and $azContext.SubscriptionName -ne $subName) {
                     Set-AzContext -Subscription $subName -WarningAction SilentlyContinue >$null
                 }
-                $virtualNetworks = Get-AzVirtualNetwork | Select-Object ResourceGroupName, Name, @{L="AddressSpacePrefix";E={$_.AddressSpace.AddressPrefixes}}, Location
+                $virtualNetworks = Get-AzVirtualNetwork
                 foreach ($vnet in $virtualNetworks) {
                     $resourceGroup = $vnet.ResourceGroupName.ToLower()
                     $vnetName = $vnet.Name.ToLower()
                     $vnetLocation = $vnet.Location
-                    $addressSpaces = $vnet.AddressSpacePrefix
+                    $addressSpaces = $vnet.AddressSpace.AddressPrefixes
 
                     if ($addressSpaces.Count -gt 1) {
                         foreach ($space in $addressSpaces) {
                             [pscustomobject]@{
+                                Subscription      = $subName
                                 ResourceGroupName = $resourceGroup
-                                VnetName = $vnetName
-                                Location = $vnetLocation
-                                AddressSpace = $space
+                                VnetName          = $vnetName
+                                Location          = $vnetLocation
+                                AddressSpace      = $space
                             }
                         }
                     } else {
                         [pscustomobject]@{
+                            Subscription      = $subName
                             ResourceGroupName = $resourceGroup
-                            VnetName = $vnetName
-                            Location = $vnetLocation
-                            AddressSpace = $addressSpaces
+                            VnetName          = $vnetName
+                            Location          = $vnetLocation
+                            AddressSpace      = $addressSpaces
                         }
                     }
                 }
