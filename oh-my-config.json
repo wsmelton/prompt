@@ -6,8 +6,8 @@
             "newline": true,
             "segments": [
                 {
-                    "background": "#529e90",
-                    "foreground": "#ffffff",
+                    "background": "#4ff45a",
+                    "foreground": "#090a2d",
                     "leading_diamond": "\ue0b6",
                     "powerline_symbol": "\ue0b0",
                     "properties": {
