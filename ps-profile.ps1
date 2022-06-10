@@ -163,7 +163,7 @@ function Reset-Az {
         $TenantId
     )
     Clear-AzContext -Force
-    Connect-AzAccount -Tenant $TenantId -WarningPreference SilentlyContinue >$null
+    Connect-AzAccount -Tenant $TenantId -WarningAction SilentlyContinue >$null
     Get-AzContext -ListAvailable | ForEach-Object { $n = $_.Name; Rename-AzContext -SourceName $n -TargetName $n.Split(' ')[0] }
     Save-AzContext -Path $azContextImport -Force
 
@@ -363,6 +363,51 @@ function Enable-PimRole {
     process {
         $providerId = 'aadRoles'
 
+    }
+}
+function Get-AzureAddressSpace {
+    [CmdletBinding()]
+    param()
+    process {
+        try {
+            $subscriptions = Get-AzSubscription -TenantId $tenantIdProd -ErrorAction Stop
+        } catch {
+            throw "Issue getting list of Subscriptions: $($_)"
+        }
+        if ($subscriptions) {
+            $subscriptions | Foreach-Object -ThrottleLimit 10 -Parallel {
+                $subName = $_.Name
+                $azContext = Get-AzContext -WarningAction SilentlyContinue
+                if ($azContext -and $azContext.SubscriptionName -ne $subName) {
+                    Set-AzContext -Subscription $subName -WarningAction SilentlyContinue >$null
+                }
+                $virtualNetworks = Get-AzVirtualNetwork | Select-Object ResourceGroupName, Name, @{L="AddressSpacePrefix";E={$_.AddressSpace.AddressPrefixes}}, Location
+                foreach ($vnet in $virtualNetworks) {
+                    $resourceGroup = $vnet.ResourceGroupName.ToLower()
+                    $vnetName = $vnet.Name.ToLower()
+                    $vnetLocation = $vnet.Location
+                    $addressSpaces = $vnet.AddressSpacePrefix
+
+                    if ($addressSpaces.Count -gt 1) {
+                        foreach ($space in $addressSpaces) {
+                            [pscustomobject]@{
+                                ResourceGroupName = $resourceGroup
+                                VnetName = $vnetName
+                                Location = $vnetLocation
+                                AddressSpace = $space
+                            }
+                        }
+                    } else {
+                        [pscustomobject]@{
+                            ResourceGroupName = $resourceGroup
+                            VnetName = $vnetName
+                            Location = $vnetLocation
+                            AddressSpace = $addressSpaces
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 #endregion functions
