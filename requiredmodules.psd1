@@ -111,4 +111,8 @@
         Version    = '2.*'
         Repository = 'PSGallery'
     }
+    'DependsOn'                                    = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
+    }
 }
