@@ -1,8 +1,4 @@
 @{
-    'oh-my-posh'                                   = @{
-        Version    = '7.*'
-        Repository = 'PSGallery'
-    }
     'posh-git'                                     = @{
         Version    = '1.*'
         Repository = 'PSGallery'
