@@ -23,8 +23,8 @@
         Version    = '0.7*'
         Repository = 'PSGallery'
     }
-    PSBicep                                        = @{
-        Version    = '2.2*'
+    Bicep                                          = @{
+        Version    = '2.*'
         Repository = 'PSGallery'
     }
     ImportExcel                                    = @{
@@ -33,10 +33,6 @@
     }
     dbatools                                       = @{
         Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    Bicep                                          = @{
-        Version    = '2.*'
         Repository = 'PSGallery'
     }
     'Az.Accounts'                                  = @{
@@ -67,8 +63,20 @@
         Version    = '4.4.0'
         Repository = 'PSGallery'
     }
-    AzureAD                                        = @{
-        Version    = '2.*'
+    'Microsoft.Graph.Applications'                 = @{
+        Version    = '*'
+        Repository = 'PSGallery'
+    }
+    'Microsoft.Graph.Users'                        = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
+    }
+    'Microsoft.Graph.Groups'                       = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
+    }
+    'Microsoft.Graph.Authentication'               = @{
+        Version    = '1.*'
         Repository = 'PSGallery'
     }
     'Microsoft.Azure.ActiveDirectory.PIM.PSModule' = @{
@@ -109,6 +117,14 @@
     }
     'DependsOn'                                    = @{
         Version    = '1.*'
+        Repository = 'PSGallery'
+    }
+    'Pansies'                                      = @{
+        Version    = '2.*'
+        Repository = 'PSGallery'
+    }
+    'PowerLine'                                    = @{
+        Version    = '3.*'
         Repository = 'PSGallery'
     }
 }

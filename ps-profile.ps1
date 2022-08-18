@@ -17,8 +17,41 @@ if (Get-Module ImportExcel -List) {
     $PSDefaultParameterValues.Add('Export-Excel:TableStyle','Light14')
 }
 
-$ohMyPoshConfig = "$PSScriptRoot\oh-my-config.json"
-oh-my-posh init pwsh --config $ohMyPoshConfig | Invoke-Expression
+# $ohMyPoshConfig = "$PSScriptRoot\oh-my-config.json"
+# oh-my-posh init pwsh --config $ohMyPoshConfig | Invoke-Expression
+<# the great and might PowerLine by Jaykul #>
+try {
+    Import-Module PowerLine -ErrorAction Stop
+    Import-Module posh-git -ErrorAction Stop
+    $global:GitPromptSettings = New-GitPromptSettings
+    $global:GitPromptSettings.BeforeStatus = ''
+    $global:GitPromptSettings.AfterStatus = ''
+    $global:GitPromptSettings.PathStatusSeparator = ''
+    $global:GitPromptSettings.BeforeStash.Text = "$(Text '&ReverseSeparator;')"
+    $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
+
+    Set-PowerLinePrompt -SetCurrentDirectory -PowerLineFont -Title {
+        -join @(
+            if (Test-Elevation) { "Administrator: " }
+            if ($IsCoreCLR) { "pwsh - " } else { "Windows PowerShell - " }
+            Convert-Path $pwd
+        )
+    } -Prompt @(
+        { "`t" } # On the first line, right-justify
+        { New-PowerLineBlock (Get-Elapsed) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Goldenrod }
+        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Wheat2 }
+        { "`n" } # Start another line
+        { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MintCream }
+        { "&Gear;" * $NestedPromptLevel }
+        { if ($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
+        # { $pwd.Drive.Name }
+        { $pwd }
+        { New-PowerLineBlock (Write-VcsStatus) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back AntiqueWhite4 }
+        { "`n" }
+    )
+} catch {
+    Write-Warning "Issue importing and configuring PowerLine: $($_)"
+}
 
 if (Get-Module Terminal-Icons -ListAvailable) {
     Import-Module Terminal-Icons
@@ -423,3 +456,7 @@ if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
         Import-AzContext -Path $azContextImport
     }
 }
+
+#region shortcuts
+Set-Alias -Name g -Value git
+#endregion shortcuts
