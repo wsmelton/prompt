@@ -1,3 +1,7 @@
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    throw "This script needs to be run As Admin"
+}
+
 if ($psedition -eq 'Core') {
     if (-not (Get-InstalledScript Install-RequiredModule)) {
         try {
@@ -42,3 +46,19 @@ try {
 } catch {
     Write-Warning "Issue creating scripts vault: $($_)"
 }
+
+<# Make sure Chocolatey is installed #>
+try {
+    choco --version >$null
+} catch {
+    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+}
+
+# install some stuff for Kubernetes management
+Write-Output "Installing Kubernetes tools"
+choco kubectl -r -y
+choco kubectx -r -y
+choco kubens -r -y
+choco k9s -r -y
+
+Write-Output "Do not forget to install Popeye as well: https://github.com/derailed/popeye/releases"
