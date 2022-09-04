@@ -40,7 +40,10 @@ try {
         { "`t" } # On the first line, right-justify
         { New-PowerLineBlock (Get-Elapsed) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Goldenrod }
         { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Wheat2 }
-        { "`n" } # Start another line
+        { "`n" } # Start another line, right-justify
+        { "`t" } # New line, right-justify
+        { New-PowerLineBlock ("k8-ctx:$(kubectl config view --minify --output 'jsonpath={..context.cluster}')") -Fore Grey100 -Back MediumSeaGreen}
+        {"`n"}
         { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MintCream }
         { "&Gear;" * $NestedPromptLevel }
         { if ($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
@@ -72,7 +75,7 @@ if (Get-Module Az.Accounts -ListAvailable) {
     $azContextImport = "$env:USERPROFILE\azure-context.json"
 }
 
-# non-PSReadLine version of the same prompt
+# non-PSReadLine version of similar prompt
 <#
 function Prompt {
     $major = $PSVersionTable.PSVersion.Major
@@ -459,4 +462,7 @@ if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
 
 #region shortcuts
 Set-Alias -Name g -Value git
+Set-Alias -Name k -Value kubectl
+Set-Alias -Name kctx -Value kubectx
+Set-Alias -Name kns -Value kubens
 #endregion shortcuts
