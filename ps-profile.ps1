@@ -63,6 +63,7 @@ if (Get-Module Terminal-Icons -ListAvailable) {
 if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core')) {
     Import-Module AzureAD -UseWindowsPowerShell -WarningAction SilentlyContinue
 }
+
 #region PSReadLine
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 #endregion PSReadLine
@@ -75,7 +76,7 @@ if (Get-Module Az.Accounts -ListAvailable) {
     $azContextImport = "$env:USERPROFILE\azure-context.json"
 }
 
-# non-PSReadLine version of similar prompt
+#region non-PSReadLine version of similar prompt
 <#
 function Prompt {
     $major = $PSVersionTable.PSVersion.Major
@@ -117,6 +118,7 @@ function Prompt {
     "[$($MyInvocation.HistoryId)] > "
 }
 #>
+#endregion non-PSReadLine version of similar prompt
 
 #region functions
 function rdp {
@@ -446,6 +448,20 @@ function Get-AzureAddressSpace {
                 }
             }
         }
+    }
+}
+function Get-PopeyeReport {
+    if ((Get-Command popeye -ErrorAction SilentlyContinue) -and (Get-Command kubectl -ErrorAction SilentlyContinue)) {
+        $clusterName = kubectl config view --minify --output 'jsonpath={..context.cluster}'
+        $currentFileDateTime = Get-Date -Format FileDateTime
+        $tempHtmlFileName = "$($clusterName)_$($currentFileDateTime).html"
+        try {
+            $env:POPEYE_REPORT_DIR = $env:temp
+            popeye -A -c -o 'html' --save --output-file $tempHtmlFileName
+        } catch {
+            throw "Issue running popeye: $($_)"
+        }
+        Invoke-Item ([IO.Path]::combine($env:temp,$tempHtmlFileName))
     }
 }
 #endregion functions
