@@ -42,8 +42,8 @@ try {
         { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Wheat2 }
         { "`n" } # Start another line, right-justify
         { "`t" } # New line, right-justify
-        { New-PowerLineBlock ("k8-ctx:$(kubectl config view --minify --output 'jsonpath={..context.cluster}')") -Fore Grey100 -Back MediumSeaGreen}
-        {"`n"}
+        { New-PowerLineBlock ("k8-ctx:$(kubectl config view --minify --output 'jsonpath={..context.cluster}')") -Fore Grey100 -Back MediumSeaGreen }
+        { "`n" }
         { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MintCream }
         { "&Gear;" * $NestedPromptLevel }
         { if ($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
