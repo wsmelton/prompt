@@ -153,10 +153,11 @@ function findAd {
     } elseif (-not (Get-Module ActiveDirectory)) {
         Import-Module ActiveDirectory -ErrorAction Stop
     }
+    $defaultProps = 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
     if ($PSBoundParameters.ContainsKey('Props')) {
-        Get-ADUser -Filter "Name -eq '$str'" -Properties $Props
+        Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
     } else {
-        Get-ADUser -Filter "Name -eq '$str'"
+        Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
     }
 }
 function Get-ClusterFailoverEvent {
