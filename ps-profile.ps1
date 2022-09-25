@@ -39,10 +39,11 @@ try {
     } -Prompt @(
         { "`t" } # On the first line, right-justify
         { New-PowerLineBlock (Get-Elapsed) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Goldenrod }
-        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Wheat2 }
+        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back OldLace }
         { "`n" } # Start another line, right-justify
         { "`t" } # New line, right-justify
-        { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "azure:$cluster" } else { "k8s:$cluster" } }) -Fore Grey100 -Back MediumSeaGreen }
+        { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "aks:$cluster" } else { "k8s:$cluster" } }) -Fore Grey100 -Back MediumSeaGreen }
+        { New-PowerLineBlock ({ "sub:$((Get-AzContext).Name)" }) -Fore Grey100 -Back SeaGreen }
         { "`n" }
         { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MintCream }
         { "&Gear;" * $NestedPromptLevel }
