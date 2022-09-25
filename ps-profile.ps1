@@ -393,40 +393,6 @@ function Set-Subscription {
         }
     }
 }
-function Enable-PimRole {
-    [CmdletBinding()]
-    param(
-        [Parameter(Mandatory,POsition = 0)]
-        [string]
-        $RoleName,
-
-        [string]
-        $Reason,
-
-        [string]
-        $Ticket,
-
-        [int]
-        $Duration = 8,
-
-        [switch]
-        $ShowActive
-    )
-    begin {
-        if ($psedition) { throw 'This function can only be used in Windows PowerShell' }
-        try {
-            $azAdSessionInfo = Get-AzureADCurrentSessionInfo -ErrorAction SilentlyContinue -WarningAction SilentlyContinue
-            $tenantId = $azAdSessionInfo.TenantId
-        } catch {
-            Connect-AzureAD
-            $tenantId = (Get-AzureADCurrentSessionInfo).TenantId
-        }
-    }
-    process {
-        $providerId = 'aadRoles'
-
-    }
-}
 function Get-AzureAddressSpace {
     [CmdletBinding()]
     param()
