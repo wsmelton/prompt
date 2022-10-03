@@ -232,16 +232,18 @@ function Reset-Az {
     Import-AzContext -Path $azContextImport >$null
 }
 function New-RandomPassword {
-    $uppercase = "ABCDEFGHKLMNOPRSTUVWXYZ".ToCharArray()
-    $lowercase = "abcdefghiklmnoprstuvwxyz".ToCharArray()
-    $number = "0123456789".ToCharArray()
-    $special = "$%&/()=?}{@#*+!".ToCharArray()
-
-    $password = ($uppercase | Get-Random -Count 3) -join ''
-    $password += ($lowercase | Get-Random -Count 5) -join ''
-    $password += ($number | Get-Random -Count 2) -join ''
-    $password += ($special | Get-Random -Count 3) -join ''
-    $password
+    [cmdletbinding()]
+    param(
+        [Parameter(Position=0)]
+        [int]$CharLength = 15
+    )
+    $charlist = [char]94..[char]126 + [char]65..[char]90 + [char]47..[char]57
+    $pwLength = (1..10 | Get-Random) + 80
+    $pwdList = @()
+    for ($i = 0; $i -lt $pwLength; $i++) {
+        $pwdList += $charList | Get-Random
+    }
+    ($pwdList -join '').Substring(0,$CharLength)
 }
 function Revoke-DomainToken {
     <#
