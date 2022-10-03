@@ -231,6 +231,18 @@ function Reset-Az {
 
     Import-AzContext -Path $azContextImport >$null
 }
+function New-RandomPassword {
+    $uppercase = "ABCDEFGHKLMNOPRSTUVWXYZ".ToCharArray()
+    $lowercase = "abcdefghiklmnoprstuvwxyz".ToCharArray()
+    $number = "0123456789".ToCharArray()
+    $special = "$%&/()=?}{@#*+!".ToCharArray()
+
+    $password = ($uppercase | Get-Random -Count 3) -join ''
+    $password += ($lowercase | Get-Random -Count 5) -join ''
+    $password += ($number | Get-Random -Count 2) -join ''
+    $password += ($special | Get-Random -Count 3) -join ''
+    $password
+}
 function Revoke-DomainToken {
     <#
     .SYNOPSIS
@@ -249,18 +261,6 @@ function Revoke-DomainToken {
     )
     begin {
         $justUsername = $Identity.Split('@')[0]
-        function New-RandomPassword {
-            $uppercase = "ABCDEFGHKLMNOPRSTUVWXYZ".ToCharArray()
-            $lowercase = "abcdefghiklmnoprstuvwxyz".ToCharArray()
-            $number = "0123456789".ToCharArray()
-            $special = "$%&/()=?}{@#*+!".ToCharArray()
-
-            $password = ($uppercase | Get-Random -Count 3) -join ''
-            $password += ($lowercase | Get-Random -Count 5) -join ''
-            $password += ($number | Get-Random -Count 2) -join ''
-            $password += ($special | Get-Random -Count 3) -join ''
-            $password
-        }
     }
     process {
         try {
@@ -459,12 +459,12 @@ function Get-PopeyeReport {
 #Import-Module Az.Tools.Predictor
 #Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
-if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
-    $data = Get-Content $azContextImport | ConvertFrom-Json
-    if ($data.Contexts.Count -gt 1) {
-        Import-AzContext -Path $azContextImport
-    }
-}
+# if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
+#     $data = Get-Content $azContextImport | ConvertFrom-Json
+#     if ($data.Contexts.Count -gt 1) {
+#         Import-AzContext -Path $azContextImport
+#     }
+# }
 
 #region shortcuts
 Set-Alias -Name g -Value git
