@@ -7,8 +7,9 @@ using namespace Microsoft.Azure.Commands.ContainerRegistry.Models
 $ProgressPreference = 'SilentlyContinue'
 
 $PSDefaultParameterValues = @{
-    "Install-Module:Scope"      = "AllUsers"
-    "Install-Module:Repository" = "PSGallery"
+    "Install-Module:Scope"            = "AllUsers"
+    "Install-Module:Repository"       = "PSGallery"
+    "Invoke-Command:HideComputerName" = $true
 }
 
 if (Get-Module ImportExcel -List) {
@@ -149,16 +150,32 @@ function findAd {
         [string[]]
         $Props
     )
-    if ($IsCoreCLR -and -not (Get-Module ActiveDirectory)) {
-        Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
-    } elseif (-not (Get-Module ActiveDirectory)) {
-        Import-Module ActiveDirectory -ErrorAction Stop
+    begin {
+        $hasSpace = $false
     }
-    $defaultProps = 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
-    if ($PSBoundParameters.ContainsKey('Props')) {
-        Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
-    } else {
-        Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
+    process {
+
+        if ($IsCoreCLR -and -not (Get-Module ActiveDirectory)) {
+            Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
+        } elseif (-not (Get-Module ActiveDirectory)) {
+            Import-Module ActiveDirectory -ErrorAction Stop
+        }
+        $hasSpace = $str.Split(' ').Count -gt 1
+
+        $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
+        if ($hasSpace) {
+            if ($PSBoundParameters.ContainsKey('Props')) {
+                Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
+            } else {
+                Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
+            }
+        } else {
+            if ($PSBoundParameters.ContainsKey('Props')) {
+                Get-ADUser -Identity $str -Properties $defaultProps,$Props
+            } else {
+                Get-ADUser -Identity $str -Properties $defaultProps
+            }
+        }
     }
 }
 function Get-ClusterFailoverEvent {
@@ -491,6 +508,59 @@ function Test-ADUserPassword {
         }
     } catch {
         throw
+    }
+}
+function findLocalAdmins {
+    [cmdletbinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string[]]
+        $Server,
+
+        [pscredential]
+        $Credential
+    )
+    $Server | ForEach-Object -ThrottleLimit 15 -Parallel {
+        $s = $_
+        $psSessionParams = @{
+            ComputerName = $s
+        }
+        if ($using:Credential) {
+            $psSessionParams.Add('Credential',$using:Credential)
+        }
+        try {
+            $psSession = New-PSSession @psSessionParams -ErrorAction Stop
+        } catch {
+            Write-Warning "Unable to connect to server: $($s) | $($_)"
+        }
+        if ($psSession) {
+            try {
+                $resultData = Invoke-Command -Session $psSession -ScriptBlock { Get-LocalGroupMember -Group Administrators } -ErrorAction Stop
+                if ($resultData) {
+                    foreach ($r in $resultData) {
+                        [pscustomobject]@{
+                            Server  = $s
+                            Name    = $r.Name
+                            Type    = $r.ObjectClass
+                            IsLocal = if ($r.PrincipalSource -eq 'Local') { $true } else { $false }
+                        }
+                    }
+                }
+            } catch {
+                $resultOld = Invoke-Command -Session $psSession -ScriptBlock { net localgroup Administrators }
+                foreach ($r in ($resultOld | Select-Object -Skip 6)) {
+                    if ($r -notlike "The command completed successfully") {
+                        [pscustomObject]@{
+                            Server  = $s
+                            Name    = $r
+                            Type    = $null
+                            IsLocal = $null
+                        }
+                    }
+                }
+            }
+            Remove-PSSession -Session $psSession
+        }
     }
 }
 #endregion functions
