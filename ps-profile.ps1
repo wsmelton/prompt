@@ -154,7 +154,6 @@ function findAd {
         $hasSpace = $false
     }
     process {
-
         if ($IsCoreCLR -and -not (Get-Module ActiveDirectory)) {
             Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
         } elseif (-not (Get-Module ActiveDirectory)) {
