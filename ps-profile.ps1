@@ -148,7 +148,12 @@ function findAd {
 
         [Parameter(Position = 1)]
         [string[]]
-        $Props
+        $Props,
+
+        [Parameter(Position = 2)]
+        [Alias('emo')]
+        [switch]
+        $ExpandMemberOf
     )
     begin {
         $hasSpace = $false
@@ -164,15 +169,22 @@ function findAd {
         $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
         if ($hasSpace) {
             if ($PSBoundParameters.ContainsKey('Props')) {
-                Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
+                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
             } else {
-                Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
+                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
             }
         } else {
             if ($PSBoundParameters.ContainsKey('Props')) {
-                Get-ADUser -Identity $str -Properties $defaultProps,$Props
+                $userResult = Get-ADUser -Identity $str -Properties $defaultProps,$Props
             } else {
-                Get-ADUser -Identity $str -Properties $defaultProps
+                $userResult = Get-ADUser -Identity $str -Properties $defaultProps
+            }
+        }
+        if ($userResult) {
+            if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
+                $userResult.MemberOf | Sort-Object
+            } else {
+                $userResult
             }
         }
     }
