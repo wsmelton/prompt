@@ -56,9 +56,9 @@ try {
 
 # install some stuff for Kubernetes management
 Write-Output "Installing Kubernetes tools"
-choco kubectl -r -y
-choco kubectx -r -y
-choco kubens -r -y
-choco k9s -r -y
+choco install kubernetes-cli -r -y
+choco install kubectx -r -y
+choco install kubens -r -y
+choco install k9s -r -y
 
 Write-Output "Do not forget to install Popeye as well: https://github.com/derailed/popeye/releases"
