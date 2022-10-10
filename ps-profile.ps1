@@ -587,6 +587,7 @@ function findLocalAdmins {
 # }
 
 #region shortcuts
+Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
 Set-Alias -Name kctx -Value kubectx
