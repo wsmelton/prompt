@@ -166,8 +166,10 @@ function findAd {
         }
         $hasSpace = $str.Split(' ').Count -gt 1
 
-        $properties = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
-        $properties += $props
+        $properties = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
+        if ($PSBoundParameters.ContainsKey('props')) {
+            $properties += $props
+        }
         if ($hasSpace) {
             if ($PSBoundParameters.ContainsKey('Props')) {
                 $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $properties
