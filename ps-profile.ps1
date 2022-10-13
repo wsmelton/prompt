@@ -166,18 +166,19 @@ function findAd {
         }
         $hasSpace = $str.Split(' ').Count -gt 1
 
-        $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
+        $properties = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate', 'UserPrincipalName'
+        $properties += $props
         if ($hasSpace) {
             if ($PSBoundParameters.ContainsKey('Props')) {
-                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps,$Props
+                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $properties
             } else {
-                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
+                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $properties
             }
         } else {
             if ($PSBoundParameters.ContainsKey('Props')) {
-                $userResult = Get-ADUser -Identity $str -Properties $defaultProps,$Props
+                $userResult = Get-ADUser -Identity $str -Properties $properties
             } else {
-                $userResult = Get-ADUser -Identity $str -Properties $defaultProps
+                $userResult = Get-ADUser -Identity $str -Properties $properties
             }
         }
         if ($userResult) {
