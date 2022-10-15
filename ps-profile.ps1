@@ -601,7 +601,7 @@ function findLocalAdmins {
             } catch {
                 $resultOld = Invoke-Command -Session $psSession -ScriptBlock { net localgroup Administrators }
                 foreach ($r in ($resultOld | Select-Object -Skip 6)) {
-                    if ($r -notlike "The command completed successfully") {
+                    if ($r -notmatch "The command completed successfully" -and -not [string]::IsNullOrEmpty($r)) {
                         [pscustomObject]@{
                             Server  = $s
                             Name    = $r
