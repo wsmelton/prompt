@@ -14,6 +14,8 @@ End result in current version:
 
 ## Profile Setup
 
+> Note: Set-ExecutionPolicy -Scope CurrentUser -Policy RemoteSigned
+
 ### Required Modules
 
 I prefer to store modules under the AllUsers scope so those files are not constantly sync'd by OneDrive. The [init.ps1](init.ps1) script will handle a few things:
