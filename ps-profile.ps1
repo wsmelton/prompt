@@ -647,3 +647,9 @@ Set-Alias -Name k -Value kubectl
 Set-Alias -Name kctx -Value kubectx
 Set-Alias -Name kns -Value kubens
 #endregion shortcuts
+
+<# VS Code Environment #>
+if ($host.Name -eq 'Visual Studio Code Host') {
+    Import-Module EditorServicesCommandSuite
+    Import-EditorCommand -Module EditorServicesCommandSuite
+}

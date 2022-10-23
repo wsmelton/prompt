@@ -7,20 +7,8 @@
         Version    = '0.9*'
         Repository = 'PSGallery'
     }
-    z                                              = @{
-        Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    PSReadLine                                     = @{
-        Version    = '2.*'
-        Repository = 'PSGallery'
-    }
     PowerShellGet                                  = @{
         Version    = '2.*'
-        Repository = 'PSGallery'
-    }
-    PSProfile                                      = @{
-        Version    = '0.7*'
         Repository = 'PSGallery'
     }
     Bicep                                          = @{
@@ -31,8 +19,8 @@
         Version    = '7.*'
         Repository = 'PSGallery'
     }
-    dbatools                                       = @{
-        Version    = '1.*'
+    EditorServicesCommandSuite                     = @{
+        Version    = '*'
         Repository = 'PSGallery'
     }
     'Az.Accounts'                                  = @{
@@ -59,12 +47,8 @@
         Version    = '0.2.*'
         Repository = 'PSGallery'
     }
-    'Az.RecoveryServices'                          = @{
-        Version    = '4.4.0'
-        Repository = 'PSGallery'
-    }
     'Microsoft.Graph.Applications'                 = @{
-        Version    = '*'
+        Version    = '1.*'
         Repository = 'PSGallery'
     }
     'Microsoft.Graph.Users'                        = @{
@@ -87,12 +71,12 @@
         Version    = '[5.3.0,6.0)'
         Repository = 'PSGallery'
     }
-    'PSRule.Rules.Azure'                           = @{
-        Version    = '[1.9.1]'
+    PSRule                                         = @{
+        Version    = '2.*'
         Repository = 'PSGallery'
     }
-    PSRule                                         = @{
-        Version    = '[1.9.0]'
+    'PSRule.Rules.Azure'                           = @{
+        Version    = '[1.17.1]'
         Repository = 'PSGallery'
     }
     InvokeBuild                                    = @{
@@ -105,22 +89,6 @@
     }
     'Microsoft.PowerShell.SecretStore'             = @{
         Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    'AkamaiPowerShell'                             = @{
-        Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    'CredentialManager'                            = @{
-        Version    = '2.*'
-        Repository = 'PSGallery'
-    }
-    'DependsOn'                                    = @{
-        Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    'Pansies'                                      = @{
-        Version    = '2.*'
         Repository = 'PSGallery'
     }
     'PowerLine'                                    = @{
