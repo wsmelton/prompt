@@ -40,13 +40,13 @@ try {
     } -Prompt @(
         { "`t" } # On the first line, right-justify
         { New-PowerLineBlock (Get-Elapsed) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Goldenrod }
-        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back OldLace }
+        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back WhiteSmoke }
         { "`n" } # Start another line, right-justify
-        { "`t" } # New line, right-justify
-        { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "aks:$cluster" } else { "k8s:$cluster" } }) -Fore Grey100 -Back MediumSeaGreen }
-        { New-PowerLineBlock ({ "sub:$((Get-AzContext).Name)" }) -Fore Grey100 -Back SeaGreen }
+        { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "aks:$cluster" } else { "k8s:$cluster" } }) -Fore YellowGreen -Back RoyalBlue }
+        { New-PowerLineBlock ({ "aps:$((Get-AzContext).Name)" }) -Fore RosyBrown -Back SandyBrown }
+        { New-PowerLineBlock ({ "acl:$((az account show -o json | ConvertFrom-Json).Name)" }) -Fore Ivory4 -Back Plum4 }
         { "`n" }
-        { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MintCream }
+        { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MediumAquamarine }
         { "&Gear;" * $NestedPromptLevel }
         { if ($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
         # { $pwd.Drive.Name }
