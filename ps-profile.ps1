@@ -43,8 +43,8 @@ try {
         { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back WhiteSmoke }
         { "`n" } # Start another line, right-justify
         { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "aks:$cluster" } else { "k8s:$cluster" } }) -Fore YellowGreen -Back RoyalBlue }
-        { New-PowerLineBlock ({ "aps:$((Get-AzContext).Name)" }) -Fore RosyBrown -Back SandyBrown }
-        { New-PowerLineBlock ({ "acl:$(az account show --query name -o tsv)" }) -Fore Ivory4 -Back Plum4 }
+        { New-PowerLineBlock ({ "aps:$((Get-AzContext).Name)" }) -Fore RosyBrown -Back PaleGreen4 }
+        { New-PowerLineBlock ({ "acl:$(az account show --query name -o tsv)" }) -Fore RosyBrown -Back Moccasin }
         { "`n" }
         { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MediumAquamarine }
         { "&Gear;" * $NestedPromptLevel }
