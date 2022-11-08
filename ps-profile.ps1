@@ -166,28 +166,28 @@ function findAd {
         }
         $hasSpace = $str.Split(' ').Count -gt 1
 
-        $properties = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
-        if ($PSBoundParameters.ContainsKey('props')) {
-            $properties += $props
-        }
-        if ($hasSpace) {
-            if ($PSBoundParameters.ContainsKey('Props')) {
-                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $properties
-            } else {
-                $userResult = Get-ADUser -Filter "Name -eq '$str'" -Properties $properties
+        $adObject = Get-ADObject -Filter "Name -eq '$str'"
+
+        if ($adObject) {
+            switch ($adObject.ObjectClass) {
+                'user' {
+                    $defautlProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
+                }
+                default {
+                    $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'UserPrincipalName'
+                }
             }
-        } else {
-            if ($PSBoundParameters.ContainsKey('Props')) {
-                $userResult = Get-ADUser -Identity $str -Properties $properties
-            } else {
-                $userResult = Get-ADUser -Identity $str -Properties $properties
+            if ($PSBoundParameters.ContainsKey('')) {
+                $defaultProps += $Props
             }
-        }
-        if ($userResult) {
-            if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
-                $userResult.MemberOf | Sort-Object
-            } else {
-                $userResult
+            $finalAdObject = Get-ADObject -Filter "Name -eq '$str'" -Properties $defaultProps
+
+            if ($finalAdObject) {
+                if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
+                    $finalAdObject.MemberOf | Sort-Object
+                } else {
+                    $finalAdObject
+                }
             }
         }
     }
@@ -621,9 +621,9 @@ function testAdMembership {
         [string]$User,
         [Parameter(Position = 1)]
         [string]$Group)
-    trap {return "error"}
+    trap { return "error" }
     $adUserParams = @{
-        Filter = "memberOf -RecursiveMatch '$((Get-ADGroup $Group).DistinguishedName)'"
+        Filter     = "memberOf -RecursiveMatch '$((Get-ADGroup $Group).DistinguishedName)'"
         SearchBase = $((Get-ADUser $User).DistinguishedName)
     }
     if (Get-ADUser @adUserParams) { $true } else { $false }
