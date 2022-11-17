@@ -35,18 +35,18 @@ try
 
     $global:Prompt = @(
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps "","`n"
-        Show-HistoryId -ForegroundColor Black -BackgroundColor MediumAquamarine
+        Show-HistoryId -Prefix "&parrot;" -ForegroundColor Black -BackgroundColor MediumAquamarine
         Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
         if (Get-Command kubectl -CommandType Application) {
-            Show-KubeContext -ForegroundColor Black -BackgroundColor RosyBrown -Caps "","`n"
+            Show-KubeContext -ForegroundColor Black -BackgroundColor RosyBrown -Caps " "
         }
 
         if (Get-Module posh-git)
         {
-            Show-PoshGitStatus -BeforeStatus "" -AfterStatus "" -PathStatusSeparator "" -Caps ""
+            Show-PoshGitStatus -AfterStatus "" -PathStatusSeparator "" -Caps ""
         }
 
-        Show-Date -Format "T" -Prefix "&twooclock;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
+        Show-Date -Format "T" -Prefix "&twothirty;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
         Show-ElapsedTime -Prefix "&stopwatch;" -ErrorForegroundColor Gray74 -ErrorBackgroundColor DarkRed -ForegroundColor Black -BackgroundColor PaleGreen4 -Alignment Right
         New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
         Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
