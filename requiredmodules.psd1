@@ -1,4 +1,8 @@
 @{
+    'TerminalBlocks'                                    = @{
+        Version    = '1.*'
+        Repository = 'PSGallery'
+    }
     'posh-git'                                     = @{
         Version    = '1.*'
         Repository = 'PSGallery'
@@ -89,10 +93,6 @@
     }
     'Microsoft.PowerShell.SecretStore'             = @{
         Version    = '1.*'
-        Repository = 'PSGallery'
-    }
-    'PowerLine'                                    = @{
-        Version    = '3.*'
         Repository = 'PSGallery'
     }
 }

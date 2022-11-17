@@ -12,7 +12,8 @@ $PSDefaultParameterValues = @{
     "Invoke-Command:HideComputerName" = $true
 }
 
-if (Get-Module ImportExcel -List) {
+if (Get-Module ImportExcel -List)
+{
     $PSDefaultParameterValues.Add('Export-Excel:FreezeTopRow',$true)
     $PSDefaultParameterValues.Add('Export-Excel:BoldTopRow',$true)
     $PSDefaultParameterValues.Add('Export-Excel:TableStyle','Light14')
@@ -21,8 +22,9 @@ if (Get-Module ImportExcel -List) {
 # $ohMyPoshConfig = "$PSScriptRoot\oh-my-config.json"
 # oh-my-posh init pwsh --config $ohMyPoshConfig | Invoke-Expression
 <# the great and might PowerLine by Jaykul #>
-try {
-    Import-Module PowerLine -ErrorAction Stop
+try
+{
+    Import-Module TerminalBlocks -ErrorAction Stop
     Import-Module posh-git -ErrorAction Stop
     $global:GitPromptSettings = New-GitPromptSettings
     $global:GitPromptSettings.BeforeStatus = ''
@@ -31,38 +33,38 @@ try {
     $global:GitPromptSettings.BeforeStash.Text = "$(Text '&ReverseSeparator;')"
     $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
 
-    Set-PowerLinePrompt -SetCurrentDirectory -PowerLineFont -Title {
-        -join @(
-            if (Test-Elevation) { "Administrator: " }
-            if ($IsCoreCLR) { "pwsh - " } else { "Windows PowerShell - " }
-            Convert-Path $pwd
-        )
-    } -Prompt @(
-        { "`t" } # On the first line, right-justify
-        { New-PowerLineBlock (Get-Elapsed) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back Goldenrod }
-        { New-PowerLineBlock (Get-Date -Format "T") -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back WhiteSmoke }
-        { "`n" } # Start another line, right-justify
-        { New-PowerLineBlock ({ $cluster = kubectl config view --minify --output 'jsonpath={..context.cluster}'; if ($cluster -match '^aks') { "aks:$cluster" } else { "k8s:$cluster" } }) -Fore YellowGreen -Back RoyalBlue }
-        { New-PowerLineBlock ({ "aps:$((Get-AzContext).Name)" }) -Fore RosyBrown -Back PaleGreen4 }
-        { New-PowerLineBlock ({ "acl:$(az account show --query name -o tsv)" }) -Fore RosyBrown -Back Moccasin }
-        { "`n" }
-        { New-PowerLineBlock ($MyInvocation.HistoryId) -Fore Black -Back MediumAquamarine }
-        { "&Gear;" * $NestedPromptLevel }
-        { if ($pushd = (Get-Location -Stack).count) { "$([char]187)" + $pushd } }
-        # { $pwd.Drive.Name }
-        { $pwd }
-        { New-PowerLineBlock (Write-VcsStatus) -ErrorBack DarkRed -ErrorFore Gray74 -Fore Black -Back AntiqueWhite4 }
-        { "`n" }
+    $global:Prompt = @(
+        Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps "","`n"
+        Show-HistoryId -ForegroundColor Black -BackgroundColor MediumAquamarine
+        Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
+        if (Get-Command kubectl -CommandType Application) {
+            Show-KubeContext -ForegroundColor Black -BackgroundColor RosyBrown -Caps "","`n"
+        }
+
+        if (Get-Module posh-git)
+        {
+            Show-PoshGitStatus -BeforeStatus "" -AfterStatus "" -PathStatusSeparator "" -Caps ""
+        }
+
+        Show-Date -Format "T" -Prefix "&twooclock;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
+        Show-ElapsedTime -Prefix "&stopwatch;" -ErrorForegroundColor Gray74 -ErrorBackgroundColor DarkRed -ForegroundColor Black -BackgroundColor PaleGreen4 -Alignment Right
+        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
+        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
     )
-} catch {
-    Write-Warning "Issue importing and configuring PowerLine: $($_)"
+    function global:Prompt { -join $Prompt }
+}
+catch
+{
+    Write-Warning "Issue importing and configuring TerminalBlocks: $($_)"
 }
 
-if (Get-Module Terminal-Icons -ListAvailable) {
+if (Get-Module Terminal-Icons -ListAvailable)
+{
     Import-Module Terminal-Icons
 }
 
-if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core')) {
+if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core'))
+{
     Import-Module AzureAD -UseWindowsPowerShell -WarningAction SilentlyContinue
 }
 
@@ -70,76 +72,40 @@ if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core')) {
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 #endregion PSReadLine
 
-if ($psedition -ne 'Core') {
+if ($psedition -ne 'Core')
+{
     [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12", "Tls11", "Tls", "Ssl3")
 }
 
-if (Get-Module Az.Accounts -ListAvailable) {
+if (Get-Module Az.Accounts -ListAvailable)
+{
     $azContextImport = "$env:USERPROFILE\azure-context.json"
 }
 
-#region non-PSReadLine version of similar prompt
-<#
-function Prompt {
-    $major = $PSVersionTable.PSVersion.Major
-    $minor = $PSVersionTable.PSVersion.Minor
-    $patch = $PSVersionTable.PSVersion.Patch
-    if ($major -lt 6) {
-        Write-Host "[PS $($major).$($minor)] [" -NoNewline
-    } else {
-        $patch = $PSVersionTable.PSVersion.Patch
-        Write-Host "[PS $($major).$($minor).$($patch)] [" -NoNewline
-    }
-    Write-Host (Get-Date -Format "HH:mm:ss") -ForegroundColor Gray -NoNewline
-
-    try {
-        $history = Get-History -ErrorAction Ignore -Count 1
-        if ($history) {
-            Write-Host "] " -NoNewline
-            $ts = New-TimeSpan $history.StartExecutionTime $history.EndExecutionTime
-            switch ($ts) {
-                { $_.TotalMinutes -ge 1 } {
-                    '[{0,5:f1} m ]' -f $_.TotalMinutes | Write-Host -ForegroundColor DarkRed -NoNewline
-                }
-                { $_.TotalMinutes -lt 1 -and $_.TotalSeconds -ge 1 } {
-                    '[{0,5:f1} s ]' -f $_.TotalSeconds | Write-Host -ForegroundColor DarkYellow -NoNewline
-                }
-                default {
-                    '[{0,5:f1}ms ]' -f $_.Milliseconds | Write-Host -ForegroundColor Cyan -NoNewline
-                }
-            }
-        } else {
-            Write-Host "] >" -ForegroundColor Gray -NoNewline
-        }
-    } catch { }
-    if (Test-Path .git) {
-        $branchName = git branch | ForEach-Object { if ( $_ -match "^\*(.*)" ) { $_ -replace "\* ", "" } }
-        Write-Host "[ git:$branchName ]" -ForegroundColor Yellow -NoNewline
-    }
-    Write-Host " $($executionContext.SessionState.Path.CurrentLocation.ProviderPath)"
-    "[$($MyInvocation.HistoryId)] > "
-}
-#>
-#endregion non-PSReadLine version of similar prompt
-
 #region functions
-function rdp {
+function rdp
+{
     [cmdletbinding()]
     param (
         $server,
         [switch]$fullScreen
     )
-    if ($fullScreen) {
+    if ($fullScreen)
+    {
         mstsc.exe -v $server -f
-    } else {
+    }
+    else
+    {
         mstsc.exe -v $server /w 2150 /h 1250
     }
 }
-function findshit ($str,$path) {
+function findshit ($str,$path)
+{
     $str = [regex]::escape($str)
     Select-String -Pattern $str -Path (Get-ChildItem $path -Recurse -Exclude 'allcommands.ps1', '*.dll', "*psproj")
 }
-function findAd {
+function findAd
+{
     [cmdletbinding()]
     param(
         [Parameter(Position = 0,Mandatory)]
@@ -155,44 +121,59 @@ function findAd {
         [switch]
         $ExpandMemberOf
     )
-    begin {
+    begin
+    {
         $hasSpace = $false
     }
-    process {
-        if ($IsCoreCLR -and -not (Get-Module ActiveDirectory)) {
+    process
+    {
+        if ($IsCoreCLR -and -not (Get-Module ActiveDirectory))
+        {
             Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
-        } elseif (-not (Get-Module ActiveDirectory)) {
+        }
+        elseif (-not (Get-Module ActiveDirectory))
+        {
             Import-Module ActiveDirectory -ErrorAction Stop
         }
         $hasSpace = $str.Split(' ').Count -gt 1
 
         $adObject = Get-ADObject -Filter "Name -eq '$str'"
 
-        if ($adObject) {
-            switch ($adObject.ObjectClass) {
-                'user' {
+        if ($adObject)
+        {
+            switch ($adObject.ObjectClass)
+            {
+                'user'
+                {
                     $defautlProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
                 }
-                default {
+                default
+                {
                     $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'UserPrincipalName'
                 }
             }
-            if ($PSBoundParameters.ContainsKey('')) {
+            if ($PSBoundParameters.ContainsKey(''))
+            {
                 $defaultProps += $Props
             }
             $finalAdObject = Get-ADObject -Filter "Name -eq '$str'" -Properties $defaultProps
 
-            if ($finalAdObject) {
-                if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
+            if ($finalAdObject)
+            {
+                if ($PSBoundParameters.ContainsKey('ExpandMemberOf'))
+                {
                     $finalAdObject.MemberOf | Sort-Object
-                } else {
+                }
+                else
+                {
                     $finalAdObject
                 }
             }
         }
     }
 }
-function findAdSrv {
+function findAdSrv
+{
     [cmdletbinding()]
     param(
         [Parameter(Position = 0,Mandatory)]
@@ -208,33 +189,46 @@ function findAdSrv {
         [switch]
         $ExpandMemberOf
     )
-    process {
-        if ($IsCoreCLR -and -not (Get-Module ActiveDirectory)) {
+    process
+    {
+        if ($IsCoreCLR -and -not (Get-Module ActiveDirectory))
+        {
             Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
-        } elseif (-not (Get-Module ActiveDirectory)) {
+        }
+        elseif (-not (Get-Module ActiveDirectory))
+        {
             Import-Module ActiveDirectory -ErrorAction Stop
         }
 
         $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'LastLogonDate'
-        if ($PSBoundParameters.ContainsKey('Props')) {
+        if ($PSBoundParameters.ContainsKey('Props'))
+        {
             $srvResult = Get-ADComputer -Identity $str -Properties $defaultProps,$Props
-        } else {
+        }
+        else
+        {
             $srvResult = Get-ADComputer -Identity $str -Properties $defaultProps
         }
-        if ($srvResult) {
-            if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
+        if ($srvResult)
+        {
+            if ($PSBoundParameters.ContainsKey('ExpandMemberOf'))
+            {
                 $srvResult.MemberOf | Sort-Object
-            } else {
+            }
+            else
+            {
                 $srvResult
             }
         }
     }
 }
-function Get-ClusterFailoverEvent {
+function Get-ClusterFailoverEvent
+{
     param([string]$Server)
     Get-WinEvent -ComputerName $Server -FilterHashtable @{LogName = 'Microsoft-Windows-FailoverClustering/Operational'; Id = 1641 }
 }
-function Find-MissingCommands {
+function Find-MissingCommands
+{
     <#
     .SYNOPSIS
     Find missing commands between the dbatools.io/commands and dbatools Module public functions
@@ -266,18 +260,23 @@ function Find-MissingCommands {
     )
     $commandPage = Get-Content $CommandPagePath
 
-    if (-not (Get-Module dbatools)) {
+    if (-not (Get-Module dbatools))
+    {
         Import-Module $ModulePath
     }
     $commands = Get-Command -Module dbatools -CommandType Cmdlet, Function | Where-Object Name -NotIn 'Where-DbaObject','New-DbaTeppCompletionResult' | Select-Object -Expand Name
 
-    if ($Reverse) {
+    if ($Reverse)
+    {
         $commandRefs = $commandPage | Select-String '<a href="http://docs.dbatools.io/' | ForEach-Object { $_.ToString().Trim() }
-        $commandRefList = foreach ($ref in $commandRefs) {
+        $commandRefList = foreach ($ref in $commandRefs)
+        {
             $ref.ToString().SubString(0,$ref.ToString().IndexOf('">')).TrimStart('<a href="http://docs.dbatools.io/')
         }
         $commandRefList | Where-Object { $_ -notin $commands }
-    } else {
+    }
+    else
+    {
         #find missing
         $notFound = $commands | ForEach-Object -ThrottleLimit 10 -Parallel { $foundIt = $using:commandPage | Select-String -Pattern $_; if (-not $foundIt) { $_ } }
 
@@ -288,7 +287,8 @@ function Find-MissingCommands {
         $notFound
     }
 }
-function Reset-Az {
+function Reset-Az
+{
     param(
         [string]
         $TenantId
@@ -300,7 +300,8 @@ function Reset-Az {
 
     Import-AzContext -Path $azContextImport >$null
 }
-function New-RandomPassword {
+function New-RandomPassword
+{
     [cmdletbinding()]
     param(
         [Parameter(Position = 0)]
@@ -309,12 +310,14 @@ function New-RandomPassword {
     $charlist = [char]94..[char]126 + [char]65..[char]90 + [char]47..[char]57
     $pwLength = (1..10 | Get-Random) + 80
     $pwdList = @()
-    for ($i = 0; $i -lt $pwLength; $i++) {
+    for ($i = 0; $i -lt $pwLength; $i++)
+    {
         $pwdList += $charList | Get-Random
     }
     ($pwdList -join '').Substring(0,$CharLength)
 }
-function Revoke-DomainToken {
+function Revoke-DomainToken
+{
     <#
     .SYNOPSIS
     Revoking user access in Active Directory and Azure AD Tenant
@@ -330,76 +333,113 @@ function Revoke-DomainToken {
         [PSCredential]
         $ADCredential
     )
-    begin {
+    begin
+    {
         $justUsername = $Identity.Split('@')[0]
     }
-    process {
-        try {
-            if ($psedition -eq 'Core') {
+    process
+    {
+        try
+        {
+            if ($psedition -eq 'Core')
+            {
                 Import-Module ActiveDirectory -UseWindowsPowerShell -ErrorAction Stop
-            } else {
+            }
+            else
+            {
                 Import-Module ActiveDirectory -ErrorAction Stop
             }
-        } catch {
+        }
+        catch
+        {
             throw "Issue loading ActiveDirectory Module: $($_)"
         }
 
-        try {
-            if ($psedition -eq 'Core') {
+        try
+        {
+            if ($psedition -eq 'Core')
+            {
                 Import-Module AzureAD -UseWindowsPowerShell -ErrorAction Stop
-            } else {
+            }
+            else
+            {
                 Import-Module AzureAD -ErrorAction Stop
             }
-        } catch {
+        }
+        catch
+        {
             throw "Issue loading AzureAD Module: $($_)"
         }
 
-        if ($PSCmdlet.ShouldProcess($justUsername,'Disabling Active Directory Identity')) {
-            try {
-                if (Get-ADUser -Identity $justUsername -Credential $ADCredential -ErrorAction SilentlyContinue) {
+        if ($PSCmdlet.ShouldProcess($justUsername,'Disabling Active Directory Identity'))
+        {
+            try
+            {
+                if (Get-ADUser -Identity $justUsername -Credential $ADCredential -ErrorAction SilentlyContinue)
+                {
                     Disable-ADAccount -Identity $justUsername -Credential $ADCredential -ErrorAction Stop
-                } else {
+                }
+                else
+                {
                     Write-Warning "No user found matching $justUsername"
                     return
                 }
-            } catch {
+            }
+            catch
+            {
                 throw "Issue disabling User [$justUsername]: $($_)"
             }
         }
-        if ($PSCmdlet.ShouldProcess($justUsername,'Reseting password to random value x2')) {
-            try {
+        if ($PSCmdlet.ShouldProcess($justUsername,'Reseting password to random value x2'))
+        {
+            try
+            {
                 1..2 | ForEach-Object {
                     Set-ADAccountPassword -Identity $justUsername -Credential $ADCredential -Reset -NewPassword (ConvertTo-SecureString -String (New-RandomPassword) -AsPlainText -Force) -ErrorAction Stop
                 }
-            } catch {
+            }
+            catch
+            {
                 throw "Issue reseting password for User [$justUsername]: $($_)"
             }
         }
-        try {
+        try
+        {
             Get-AzureADTenantDetail -ErrorAction Stop >$null
             Write-Host 'Connected to Azure AD'
-        } catch {
+        }
+        catch
+        {
             Write-Warning "No active connection found to Azure AD"
             Connect-AzureAD >$null
         }
 
-        if ($PSCmdlet.ShouldProcess($Identity,'Disabling Azure AD Identity')) {
-            try {
+        if ($PSCmdlet.ShouldProcess($Identity,'Disabling Azure AD Identity'))
+        {
+            try
+            {
                 Set-AzureADUser -ObjectId $Identity -AccountEnabled $false -ErrorAction Stop
-            } catch {
+            }
+            catch
+            {
                 throw "Issue disabling Azure AD Account [$Identity]: $($_)"
             }
         }
-        if ($PSCmdlet.ShouldProcess($Identity,'Revoking Azure AD Token')) {
-            try {
+        if ($PSCmdlet.ShouldProcess($Identity,'Revoking Azure AD Token'))
+        {
+            try
+            {
                 Revoke-AzureADUserAllRefreshToken -ObjectId $Identity -ErrorAction Stop
-            } catch {
+            }
+            catch
+            {
                 throw "Issue revoking Azure AD Account [$Identity]: $($_)"
             }
         }
     }
 }
-filter Get-AcrTag {
+filter Get-AcrTag
+{
     <#
     .SYNOPSIS
         Search ACR for repositories and get latest tags
@@ -426,24 +466,30 @@ filter Get-AcrTag {
         [switch]$Force
     )
     $global:AzContainerRegistryRepositoryCache += @{}
-    if (!$Force -and $AzContainerRegistryRepositoryCache.ContainsKey($RegistryName)) {
+    if (!$Force -and $AzContainerRegistryRepositoryCache.ContainsKey($RegistryName))
+    {
         Write-Verbose "Using cached repository list (specify -Force to re-fetch)"
-    } else {
+    }
+    else
+    {
         Write-Verbose "Looking for new repositories"
         $global:AzContainerRegistryRepositoryCache[$RegistryName] = Get-AzContainerRegistryRepository -RegistryName $RegistryName
     }
 
     $Repositories = $global:AzContainerRegistryRepositoryCache[$RegistryName] -match "($($name -join '|'))$"
-    foreach ($repo in $Repositories) {
+    foreach ($repo in $Repositories)
+    {
         Write-Verbose "Fetching version tags for $repo"
-        foreach ($registry in Get-AzContainerRegistryTag -RegistryName $azContainerRegistry -RepositoryName $repo -ea 0) {
+        foreach ($registry in Get-AzContainerRegistryTag -RegistryName $azContainerRegistry -RepositoryName $repo -ea 0)
+        {
             # Sort the tags the opposite direction
             $registry.Tags.Sort( { -1 * $args[0].LastUpdateTime.CompareTo($args[1].LastUpdateTime) } )
             $registry
         }
     }
 }
-function Set-Subscription {
+function Set-Subscription
+{
     [Alias("ss")]
     [CmdletBinding()]
     param (
@@ -454,41 +500,54 @@ function Set-Subscription {
         [string]
         $TenantId = $tenantIdProd
     )
-    process {
+    process
+    {
         $cContext = Get-AzContext
-        if ($cContext.Name -ne $SubName) {
+        if ($cContext.Name -ne $SubName)
+        {
             $result = Select-AzSubscription $SubName -Tenant $TenantId
         }
-        if ($result.Name -eq $SubName) {
+        if ($result.Name -eq $SubName)
+        {
             Write-Host "Context switched to subscription: [$SubName]" -ForegroundColor DarkCyan
         }
     }
 }
-function Get-AzureAddressSpace {
+function Get-AzureAddressSpace
+{
     [CmdletBinding()]
     param()
-    process {
-        try {
+    process
+    {
+        try
+        {
             $subscriptions = Get-AzSubscription -TenantId $tenantIdProd -ErrorAction Stop
-        } catch {
+        }
+        catch
+        {
             throw "Issue getting list of Subscriptions: $($_)"
         }
-        if ($subscriptions) {
+        if ($subscriptions)
+        {
             $subscriptions | ForEach-Object -ThrottleLimit 10 -Parallel {
                 $subName = $_.Name
                 $azContext = Get-AzContext -WarningAction SilentlyContinue
-                if ($azContext -and $azContext.SubscriptionName -ne $subName) {
+                if ($azContext -and $azContext.SubscriptionName -ne $subName)
+                {
                     Set-AzContext -Subscription $subName -WarningAction SilentlyContinue >$null
                 }
                 $virtualNetworks = Get-AzVirtualNetwork
-                foreach ($vnet in $virtualNetworks) {
+                foreach ($vnet in $virtualNetworks)
+                {
                     $resourceGroup = $vnet.ResourceGroupName.ToLower()
                     $vnetName = $vnet.Name.ToLower()
                     $vnetLocation = $vnet.Location
                     $addressSpaces = $vnet.AddressSpace.AddressPrefixes
 
-                    if ($addressSpaces.Count -gt 1) {
-                        foreach ($space in $addressSpaces) {
+                    if ($addressSpaces.Count -gt 1)
+                    {
+                        foreach ($space in $addressSpaces)
+                        {
                             [pscustomobject]@{
                                 Subscription      = $subName
                                 ResourceGroupName = $resourceGroup
@@ -497,7 +556,9 @@ function Get-AzureAddressSpace {
                                 AddressSpace      = $space
                             }
                         }
-                    } else {
+                    }
+                    else
+                    {
                         [pscustomobject]@{
                             Subscription      = $subName
                             ResourceGroupName = $resourceGroup
@@ -511,21 +572,27 @@ function Get-AzureAddressSpace {
         }
     }
 }
-function Get-PopeyeReport {
-    if ((Get-Command popeye -ErrorAction SilentlyContinue) -and (Get-Command kubectl -ErrorAction SilentlyContinue)) {
+function Get-PopeyeReport
+{
+    if ((Get-Command popeye -ErrorAction SilentlyContinue) -and (Get-Command kubectl -ErrorAction SilentlyContinue))
+    {
         $clusterName = kubectl config view --minify --output 'jsonpath={..context.cluster}'
         $currentFileDateTime = Get-Date -Format FileDateTime
         $tempHtmlFileName = "$($clusterName)_$($currentFileDateTime).html"
-        try {
+        try
+        {
             $env:POPEYE_REPORT_DIR = $env:temp
             popeye -A -c -o 'html' --save --output-file $tempHtmlFileName
-        } catch {
+        }
+        catch
+        {
             throw "Issue running popeye: $($_)"
         }
         Invoke-Item ([IO.Path]::combine($env:temp,$tempHtmlFileName))
     }
 }
-function Test-ADUserPassword {
+function Test-ADUserPassword
+{
     [cmdletbinding()]
     param(
         [Parameter(Mandatory)]
@@ -539,30 +606,45 @@ function Test-ADUserPassword {
         [string]
         $Server
     )
-    try {
+    try
+    {
         Add-Type -AssemblyName System.DirectoryServices.AccountManagement -ErrorAction Stop
-        try {
-            if ($PSBoundParameters.ContainsKey('Server')) {
+        try
+        {
+            if ($PSBoundParameters.ContainsKey('Server'))
+            {
                 $pContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext($ContextType,$Server)
-            } else {
+            }
+            else
+            {
                 $pContext = New-Object System.DirectoryServices.AccountManagement.PrincipalContext($ContextType)
             }
-        } catch {
+        }
+        catch
+        {
             Write-Error -Message "Issue connecting $ContextType -- $($_)"
         }
-        try {
+        try
+        {
             $pContext.ValidateCredentials($Credential.UserName, $Credential.GetNetworkCredential().Password,'Negotiate')
-        } catch [UnauthorizedAccessException] {
+        }
+        catch [UnauthorizedAccessException]
+        {
             Write-Warning -Message "Access denied when connecting to server."
             return $false
-        } catch {
+        }
+        catch
+        {
             Write-Error -Exception $_.Exception -Message "Unhandled error occurred: $($_)"
         }
-    } catch {
+    }
+    catch
+    {
         throw
     }
 }
-function findLocalAdmins {
+function findLocalAdmins
+{
     [cmdletbinding()]
     param(
         [Parameter(Mandatory)]
@@ -577,19 +659,27 @@ function findLocalAdmins {
         $psSessionParams = @{
             ComputerName = $s
         }
-        if ($using:Credential) {
+        if ($using:Credential)
+        {
             $psSessionParams.Add('Credential',$using:Credential)
         }
-        try {
+        try
+        {
             $psSession = New-PSSession @psSessionParams -ErrorAction Stop
-        } catch {
+        }
+        catch
+        {
             Write-Warning "Unable to connect to server: $($s) | $($_)"
         }
-        if ($psSession) {
-            try {
+        if ($psSession)
+        {
+            try
+            {
                 $resultData = Invoke-Command -Session $psSession -ScriptBlock { Get-LocalGroupMember -Group Administrators } -ErrorAction Stop
-                if ($resultData) {
-                    foreach ($r in $resultData) {
+                if ($resultData)
+                {
+                    foreach ($r in $resultData)
+                    {
                         [pscustomobject]@{
                             Server  = $s
                             Name    = $r.Name
@@ -598,10 +688,14 @@ function findLocalAdmins {
                         }
                     }
                 }
-            } catch {
+            }
+            catch
+            {
                 $resultOld = Invoke-Command -Session $psSession -ScriptBlock { net localgroup Administrators }
-                foreach ($r in ($resultOld | Select-Object -Skip 6)) {
-                    if ($r -notmatch "The command completed successfully" -and -not [string]::IsNullOrEmpty($r)) {
+                foreach ($r in ($resultOld | Select-Object -Skip 6))
+                {
+                    if ($r -notmatch "The command completed successfully" -and -not [string]::IsNullOrEmpty($r))
+                    {
                         [pscustomObject]@{
                             Server  = $s
                             Name    = $r
@@ -615,7 +709,8 @@ function findLocalAdmins {
         }
     }
 }
-function testAdMembership {
+function testAdMembership
+{
     param(
         [Parameter(Position = 0)]
         [string]$User,
@@ -649,7 +744,8 @@ Set-Alias -Name kns -Value kubens
 #endregion shortcuts
 
 <# VS Code Environment #>
-if ($host.Name -eq 'Visual Studio Code Host') {
+if ($host.Name -eq 'Visual Studio Code Host')
+{
     Import-Module EditorServicesCommandSuite
     Import-EditorCommand -Module EditorServicesCommandSuite
 }
