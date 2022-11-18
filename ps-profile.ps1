@@ -19,44 +19,6 @@ if (Get-Module ImportExcel -List)
     $PSDefaultParameterValues.Add('Export-Excel:TableStyle','Light14')
 }
 
-# $ohMyPoshConfig = "$PSScriptRoot\oh-my-config.json"
-# oh-my-posh init pwsh --config $ohMyPoshConfig | Invoke-Expression
-<# the great and might PowerLine by Jaykul #>
-try
-{
-    Import-Module TerminalBlocks -ErrorAction Stop
-    Import-Module posh-git -ErrorAction Stop
-    $global:GitPromptSettings = New-GitPromptSettings
-    $global:GitPromptSettings.BeforeStatus = ''
-    $global:GitPromptSettings.AfterStatus = ''
-    $global:GitPromptSettings.PathStatusSeparator = ''
-    $global:GitPromptSettings.BeforeStash.Text = "$(Text '&ReverseSeparator;')"
-    $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
-
-    $global:Prompt = @(
-        Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps "","`n"
-        Show-HistoryId -Prefix "&parrot;" -ForegroundColor Black -BackgroundColor MediumAquamarine
-        Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
-        if (Get-Command kubectl -CommandType Application) {
-            Show-KubeContext -ForegroundColor Black -BackgroundColor RosyBrown -Caps " "
-        }
-
-        if (Get-Module posh-git)
-        {
-            Show-PoshGitStatus -AfterStatus "" -PathStatusSeparator "" -Caps ""
-        }
-        Show-Date -Format "T" -Prefix "&fiveoclock;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
-        Show-ElapsedTime -Prefix "&timerclock;" -ForegroundColor Black -BackgroundColor PaleGreen4 -Alignment Right
-        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
-        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
-    )
-    function global:Prompt { -join $Prompt }
-}
-catch
-{
-    Write-Warning "Issue importing and configuring TerminalBlocks: $($_)"
-}
-
 if (Get-Module Terminal-Icons -ListAvailable)
 {
     Import-Module Terminal-Icons
@@ -747,4 +709,42 @@ if ($host.Name -eq 'Visual Studio Code Host')
 {
     Import-Module EditorServicesCommandSuite
     Import-EditorCommand -Module EditorServicesCommandSuite
+}
+
+# $ohMyPoshConfig = "$PSScriptRoot\oh-my-config.json"
+# oh-my-posh init pwsh --config $ohMyPoshConfig | Invoke-Expression
+<# the great and might PowerLine by Jaykul #>
+try
+{
+    Import-Module TerminalBlocks -ErrorAction Stop
+    Import-Module posh-git -ErrorAction Stop
+    $global:GitPromptSettings = New-GitPromptSettings
+    $global:GitPromptSettings.BeforeStatus = ''
+    $global:GitPromptSettings.AfterStatus = ''
+    $global:GitPromptSettings.PathStatusSeparator = ''
+    $global:GitPromptSettings.BeforeStash.Text = "$(Text '&ReverseSeparator;')"
+    $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
+
+    $global:Prompt = @(
+        Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps "","`n"
+        Show-HistoryId -Prefix "&parrot;" -ForegroundColor Black -BackgroundColor MediumAquamarine
+        Show-ElapsedTime -Autoformat -Prefix "&timerclock;`u{fe0f}" -ForegroundColor Black -BackgroundColor PaleGreen4
+        Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
+        if (Get-Command kubectl -CommandType Application) {
+            Show-KubeContext -ForegroundColor Black -BackgroundColor RosyBrown -Caps " "
+        }
+
+        if (Get-Module posh-git)
+        {
+            Show-PoshGitStatus -AfterStatus "" -PathStatusSeparator "" -Caps ""
+        }
+        Show-Date -Format "T" -Prefix "&fiveoclock;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
+        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
+        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
+    )
+    function global:Prompt { -join $Prompt }
+}
+catch
+{
+    Write-Warning "Issue importing and configuring TerminalBlocks: $($_)"
 }
