@@ -45,7 +45,7 @@ try
         {
             Show-PoshGitStatus -AfterStatus "" -PathStatusSeparator "" -Caps ""
         }
-        Show-Date -Format "T" -Prefix "&fiveoclock;" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right -Caps ""
+        Show-Date -Format "T" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
         Show-ElapsedTime -ForegroundColor Black -BackgroundColor PaleGreen4 -Alignment Right
         New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
         Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
