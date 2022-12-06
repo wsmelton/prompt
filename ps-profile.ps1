@@ -117,16 +117,24 @@ function findAd {
         if ($adObject) {
             switch ($adObject.ObjectClass) {
                 'user' {
-                    $defautlProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
+                    $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'LastLogonDate', 'PasswordLastSet', 'UserPrincipalName', 'CannotChangePassword', 'PasswordNeverExpires'
+
+                    if ($PSBoundParameters.ContainsKey('Props')) {
+                        $defaultProps = $defaultProps, $Props
+                    }
+                    Write-Verbose "Properties: $($defaultProps -join ',')"
+                    $finalAdObject = Get-ADUser -Filter "Name -eq '$str'" -Properties $defaultProps
                 }
                 default {
                     $defaultProps = 'Description', 'MemberOf', 'whenCreated', 'whenChanged', 'UserPrincipalName'
+
+                    if ($PSBoundParameters.ContainsKey('Props')) {
+                        $defaultProps = $defaultProps, $Props
+                    }
+                    Write-Verbose "Properties: $($defaultProps -join ',')"
+                    $finalAdObject = Get-ADObject -Filter "Name -eq '$str'" -Properties $defaultProps
                 }
             }
-            if ($PSBoundParameters.ContainsKey('')) {
-                $defaultProps += $Props
-            }
-            $finalAdObject = Get-ADObject -Filter "Name -eq '$str'" -Properties $defaultProps
 
             if ($finalAdObject) {
                 if ($PSBoundParameters.ContainsKey('ExpandMemberOf')) {
