@@ -26,7 +26,7 @@ try {
         }
         Show-Date -Format "T" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
         New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
-        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1') -ContinuationPrompt (New-Text "❯ " -Foreground 'SteelBlue1')
+        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1')
     )
     function global:Prompt { -join $Prompt }
 } catch {
@@ -596,6 +596,7 @@ Set-Alias -Name kns -Value kubens
 
 <# VS Code Environment #>
 if ($host.Name -eq 'Visual Studio Code Host') {
-    Import-Module EditorServicesCommandSuite
-    Import-CommandSuite
+    if (Import-Module EditorServicesCommandSuite) {
+        Import-EditorCommand -Module EditorServicesCommandSuite
+    }
 }
