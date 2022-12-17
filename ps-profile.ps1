@@ -14,19 +14,19 @@ try {
     $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
 
     $global:Prompt = @(
-        Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps "","`n"
-        Show-HistoryId -Prefix "#" -ForegroundColor Black -BackgroundColor MediumAquamarine
-        Show-ElapsedTime -Prefix "" -ForegroundColor Black -BackgroundColor PaleGreen4
+        Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
+        Show-HistoryId -Prefix '#' -ForegroundColor Black -BackgroundColor MediumAquamarine
+        Show-ElapsedTime -Prefix '' -ForegroundColor Black -BackgroundColor PaleGreen4
         Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
         Show-KubeContext -BackGroundColor '#7fedc8'
         Show-AzureContext -BackGroundColor '#99d090'
 
         if (Get-Module posh-git) {
-            Show-PoshGitStatus -AfterStatus "" -PathStatusSeparator "" -Caps ""
+            Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
         }
-        Show-Date -Format "T" -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
-        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps ""," "
-        Set-PSReadLineOption -PromptText (New-Text "❯ " -Foreground AntiqueWhite4), (New-Text "❯ " -Foreground 'VioletRed1')
+        Show-Date -Format 'T' -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
+        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps '',' '
+        Set-PSReadLineOption -PromptText (New-Text '❯ ' -Foreground AntiqueWhite4), (New-Text '❯ ' -Foreground 'VioletRed1')
     )
     function global:Prompt { -join $Prompt }
 } catch {
@@ -37,9 +37,9 @@ try {
 $ProgressPreference = 'SilentlyContinue'
 
 $PSDefaultParameterValues = @{
-    "Install-Module:Scope"            = "AllUsers"
-    "Install-Module:Repository"       = "PSGallery"
-    "Invoke-Command:HideComputerName" = $true
+    'Install-Module:Scope'            = 'AllUsers'
+    'Install-Module:Repository'       = 'PSGallery'
+    'Invoke-Command:HideComputerName' = $true
 }
 
 if (Get-Module ImportExcel -List) {
@@ -61,7 +61,7 @@ Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 #endregion PSReadLine
 
 if ($psedition -ne 'Core') {
-    [System.Net.ServicePointManager]::SecurityProtocol = @("Tls12", "Tls11", "Tls", "Ssl3")
+    [System.Net.ServicePointManager]::SecurityProtocol = @('Tls12', 'Tls11', 'Tls', 'Ssl3')
 }
 
 if (Get-Module Az.Accounts -ListAvailable) {
@@ -83,7 +83,7 @@ function rdp {
 }
 function findshit ($str,$path) {
     $str = [regex]::escape($str)
-    Select-String -Pattern $str -Path (Get-ChildItem $path -Recurse -Exclude 'allcommands.ps1', '*.dll', "*psproj")
+    Select-String -Pattern $str -Path (Get-ChildItem $path -Recurse -Exclude 'allcommands.ps1', '*.dll', '*psproj')
 }
 function findAd {
     [cmdletbinding()]
@@ -333,7 +333,7 @@ function Revoke-DomainToken {
             Get-AzureADTenantDetail -ErrorAction Stop >$null
             Write-Host 'Connected to Azure AD'
         } catch {
-            Write-Warning "No active connection found to Azure AD"
+            Write-Warning 'No active connection found to Azure AD'
             Connect-AzureAD >$null
         }
 
@@ -363,12 +363,12 @@ filter Get-AcrTag {
         Test-MyTestFunction -Verbose
         Explanation of the function or its result. You can include multiple examples with additional .EXAMPLE lines
     #>
-    [Alias("Get-BicepTag","gat","gbt")]
+    [Alias('Get-BicepTag','gat','gbt')]
     [CmdletBinding()]
     param(
         # The (partial) name of the repository.
         [Parameter(Mandatory, ValueFromRemainingArguments, Position = 0)]
-        [Alias("RepositoryName")]
+        [Alias('RepositoryName')]
         [string[]]$Name,
 
         # The name of the registry to search.
@@ -381,9 +381,9 @@ filter Get-AcrTag {
     )
     $global:AzContainerRegistryRepositoryCache += @{}
     if (!$Force -and $AzContainerRegistryRepositoryCache.ContainsKey($RegistryName)) {
-        Write-Verbose "Using cached repository list (specify -Force to re-fetch)"
+        Write-Verbose 'Using cached repository list (specify -Force to re-fetch)'
     } else {
-        Write-Verbose "Looking for new repositories"
+        Write-Verbose 'Looking for new repositories'
         $global:AzContainerRegistryRepositoryCache[$RegistryName] = Get-AzContainerRegistryRepository -RegistryName $RegistryName
     }
 
@@ -398,7 +398,7 @@ filter Get-AcrTag {
     }
 }
 function Set-Subscription {
-    [Alias("ss")]
+    [Alias('ss')]
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromRemainingArguments, Position = 0)]
@@ -507,7 +507,7 @@ function Test-ADUserPassword {
         try {
             $pContext.ValidateCredentials($Credential.UserName, $Credential.GetNetworkCredential().Password,'Negotiate')
         } catch [UnauthorizedAccessException] {
-            Write-Warning -Message "Access denied when connecting to server."
+            Write-Warning -Message 'Access denied when connecting to server.'
             return $false
         } catch {
             Write-Error -Exception $_.Exception -Message "Unhandled error occurred: $($_)"
@@ -555,7 +555,7 @@ function findLocalAdmins {
             } catch {
                 $resultOld = Invoke-Command -Session $psSession -ScriptBlock { net localgroup Administrators }
                 foreach ($r in ($resultOld | Select-Object -Skip 6)) {
-                    if ($r -notmatch "The command completed successfully" -and -not [string]::IsNullOrEmpty($r)) {
+                    if ($r -notmatch 'The command completed successfully' -and -not [string]::IsNullOrEmpty($r)) {
                         [pscustomObject]@{
                             Server  = $s
                             Name    = $r
@@ -575,7 +575,7 @@ function testAdMembership {
         [string]$User,
         [Parameter(Position = 1)]
         [string]$Group)
-    trap { return "error" }
+    trap { return 'error' }
     $adUserParams = @{
         Filter     = "memberOf -RecursiveMatch '$((Get-ADGroup $Group).DistinguishedName)'"
         SearchBase = $((Get-ADUser $User).DistinguishedName)
