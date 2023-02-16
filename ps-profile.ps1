@@ -18,8 +18,8 @@ try {
         Show-HistoryId -Prefix '#' -ForegroundColor Black -BackgroundColor MediumAquamarine
         Show-ElapsedTime -Prefix '' -ForegroundColor Black -BackgroundColor PaleGreen4
         Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
-        Show-KubeContext -BackGroundColor '#7fedc8'
-        Show-AzureContext -BackGroundColor '#99d090'
+        Show-KubeContext -BackgroundColor MediumAquamarine -DefaultForegroundColor Black
+        Show-AzureContext -BackgroundColor MediumAquamarine -DefaultForegroundColor Black
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
@@ -69,7 +69,7 @@ if (Get-Module Az.Accounts -ListAvailable) {
 }
 
 #region functions
-function rdp {
+function myrdp {
     [cmdletbinding()]
     param (
         $server,
