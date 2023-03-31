@@ -247,22 +247,9 @@ function Reset-Az {
         [string]
         $TenantId
     )
-    Clear-AzContext -Force -ErrorAction SilentlyContinue
+    Clear-AzContext -Force
     Connect-AzAccount -Tenant $TenantId -WarningAction SilentlyContinue >$null
-    $contexts = Get-AzContext -ListAvailable
-    foreach ($context in $contexts) {
-        $originalName = $context.Name
-        $subName = $originalName.Split(' ')[0]
-        if ($subName -match 'inf') {
-            $n = $subName
-        } else {
-            $postFix = $subName.Split('-')[-1]
-            if ($postFix -eq '01') {
-                $n = "$($subName.Split('-')[-2])-$postFix"
-            }
-        }
-        Rename-AzContext -SourceName $originalName -TargetName $n -Force
-    }
+    Get-AzContext -ListAvailable | ForEach-Object { $n = $_.Name; Rename-AzContext -SourceName $n -TargetName $n.Split(' ')[0] }
     Save-AzContext -Path $azContextImport -Force
 
     Import-AzContext -Path $azContextImport >$null
@@ -629,7 +616,7 @@ function Deploy-PSContainer {
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
-Set-Alias -Name kctx -Value kubectx
+Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name kexecps -Value Deploy-PSContainer
 #endregion shortcuts
