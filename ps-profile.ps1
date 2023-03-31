@@ -15,11 +15,11 @@ try {
 
     $global:Prompt = @(
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
-        Show-HistoryId -Prefix '#' -ForegroundColor Black -BackgroundColor MediumAquamarine
-        Show-ElapsedTime -Prefix '' -ForegroundColor Black -BackgroundColor PaleGreen4
-        Show-Path -DriveName -ForegroundColor SteelBlue1 -BackGroundColor RoyalBlue
-        Show-KubeContext -BackgroundColor MediumAquamarine -DefaultForegroundColor Black
-        Show-AzureContext -BackgroundColor MediumAquamarine -DefaultForegroundColor Black
+        Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackGroundColor MediumAquamarine
+        Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White
+        Show-Path -DriveName -ForegroundColor SteelBlue1 -DefaultBackGroundColor RoyalBlue
+        Show-KubeContext -DefaultBackgroundColor White -DefaultForegroundColor Black
+        Show-AzureContext -DefaultBackgroundColor White -DefaultForegroundColor SeaGreen1
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
@@ -247,9 +247,22 @@ function Reset-Az {
         [string]
         $TenantId
     )
-    Clear-AzContext -Force
+    Clear-AzContext -Force -ErrorAction SilentlyContinue
     Connect-AzAccount -Tenant $TenantId -WarningAction SilentlyContinue >$null
-    Get-AzContext -ListAvailable | ForEach-Object { $n = $_.Name; Rename-AzContext -SourceName $n -TargetName $n.Split(' ')[0] }
+    $contexts = Get-AzContext -ListAvailable
+    foreach ($context in $contexts) {
+        $originalName = $context.Name
+        $subName = $originalName.Split(' ')[0]
+        if ($subName -match 'inf') {
+            $n = $subName
+        } else {
+            $postFix = $subName.Split('-')[-1]
+            if ($postFix -eq '01') {
+                $n = "$($subName.Split('-')[-2])-$postFix"
+            }
+        }
+        Rename-AzContext -SourceName $originalName -TargetName $n -Force
+    }
     Save-AzContext -Path $azContextImport -Force
 
     Import-AzContext -Path $azContextImport >$null
@@ -582,6 +595,24 @@ function testAdMembership {
     }
     if (Get-ADUser @adUserParams) { $true } else { $false }
 }
+function Watch-PodLog {
+    <#
+        .SYNOPSIS
+        Watch the logs for a given Namespace and particular pod (by index number of the "kubectl get pod" output
+    #>
+    [Alias('kpl')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [string]$Namespace,
+        [Parameter(Position=1)]
+        [string]$Index = 1
+    )
+    kubectl logs -f (kubectl get pod -n $Namespace -o name | Select-Object -Index $Index) -n $Namespace
+}
+function Deploy-PSContainer {
+    kubectl run -it --rm aks-powershell --image=mcr.microsoft.com/powershell:latest -n default
+}
 #endregion functions
 
 #Import-Module Az.Tools.Predictor
@@ -600,6 +631,7 @@ Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
 Set-Alias -Name kctx -Value kubectx
 Set-Alias -Name kns -Value kubens
+Set-Alias -Name kexecps -Value Deploy-PSContainer
 #endregion shortcuts
 
 <# VS Code Environment #>
