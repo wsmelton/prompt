@@ -15,9 +15,9 @@ try {
 
     $global:Prompt = @(
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
-        Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackGroundColor MediumAquamarine
+        Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackgroundColor MediumAquamarine
         Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White
-        Show-Path -DriveName -ForegroundColor SteelBlue1 -DefaultBackGroundColor RoyalBlue
+        Show-Path -DriveName -ForegroundColor SteelBlue1 -DefaultBackgroundColor RoyalBlue
         Show-KubeContext -DefaultBackgroundColor White -DefaultForegroundColor Black
         Show-AzureContext -DefaultBackgroundColor White -DefaultForegroundColor SeaGreen1
 
@@ -582,7 +582,31 @@ function testAdMembership {
     }
     if (Get-ADUser @adUserParams) { $true } else { $false }
 }
-function Watch-PodLog {
+# Kubernetes
+function Open-AksResources {
+    <#
+        .SYNOPSIS
+        Opens up the Workload panel of the AKS Cluster in the specified environment.
+    #>
+    [Alias('aksp')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position = 0)]
+        [ValidateSet('dv1','qa1','sg1','rprd')]
+        [string]$EnvCode
+    )
+    $clusterName = "aks-loandepotdev-azusw2-dvo-$EnvCode"
+    $rgName = "rg-loandepotdev-azusw2-dvo-$EnvCode"
+    Write-Verbose "Opening Workloads panel for $clusterName"
+    az aks browse --name $clusterName --resource-group $rgName --subscription "sb-azu-dvo-$EnvCode"
+}
+function Deploy-PSContainer {
+    [Alias('krps')]
+    [CmdletBinding()]
+    param()
+    kubectl run -it --rm aks-powershell --image=mcr.microsoft.com/powershell:latest -n default
+}
+function Get-PodLog {
     <#
         .SYNOPSIS
         Watch the logs for a given Namespace and particular pod (by index number of the "kubectl get pod" output
@@ -590,15 +614,92 @@ function Watch-PodLog {
     [Alias('kpl')]
     [CmdletBinding()]
     param(
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [string]$Namespace,
         [Parameter(Position=1)]
         [string]$Index = 1
     )
     kubectl logs -f (kubectl get pod -n $Namespace -o name | Select-Object -Index $Index) -n $Namespace
 }
-function Deploy-PSContainer {
-    kubectl run -it --rm aks-powershell --image=mcr.microsoft.com/powershell:latest -n default
+function Get-PodLogStern {
+    <#
+        .SYNOPSIS
+        Get logs of all pods in a namespace using stern utility. https://github.com/stern/stern
+    #>
+    [Alias('kstern')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [string]$Namespace,
+
+        # Pull logs since (use 2h, 5m, etc.). Default: 2h (2 hours)
+        [Parameter(Position=1)]
+        [string]$Since = '30m',
+
+        # Include only lines container provided regular expression (e.g., "The file uploaded*")
+        [Parameter(Position=2)]
+        [string]$Include,
+
+        # Container state to return (running, waiting, terminated, or all)
+        # Pass in multiple vai single-stringed, comma-separated (e.g. 'running, waiting')
+        # Pass in 'all' to get everything
+        [Parameter(Position=3)]
+        [string]$State = 'running',
+
+        # Output log data to JSON format
+        [switch]$Output,
+
+        # Follow the logs for the namespace
+        [boolean]$EnableFollow
+    )
+    if (kubectl krew info stern) {
+        if ($Output) {
+            $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json) :
+            (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json)
+        } else {
+        $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short) :
+            (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short)
+        }
+    } else {
+        Write-Warning "Stern utility was not found installed via krew"
+    }
+}
+function Get-PodTopMetric {
+    <#
+        .SYNOPSIS
+        Return TOP metrics for a pod in a given namespace
+    #>
+    [Alias('kpt')]
+    [CmdletBinding()]
+    param(
+        # Namespace to pull
+        [Parameter(Position = 0)]
+        [string]$Namespace,
+
+        # Output details on all containers in the pod
+        [switch]$Containers
+    )
+    $Containers ? (kubectl top pod -n $Namespace --containers) : (kubectl top pod -n $Namespace)
+}
+function New-PodTrace {
+    <#
+        .SYNOPSIS
+        Runs tcpdump on remote pod and writes the output to a local file.
+        Open in Wireshark after the pod is killed or you kill the sniff execution
+    #>
+    [Alias('ksniff')]
+    [CmdletBinding()]
+    param(
+        # Pod name to sniff
+        [Parameter(Position=0)]
+        [string]$PodName,
+
+        # Namespace of pod
+        [Parameter(Position=1)]
+        [string]$Namespace
+
+    )
+    kubectl sniff $PodName -n $Namespace -o "c:\tmp\$($PodName).tcpdump"
 }
 #endregion functions
 
@@ -618,7 +719,6 @@ Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
-Set-Alias -Name kexecps -Value Deploy-PSContainer
 #endregion shortcuts
 
 <# VS Code Environment #>
