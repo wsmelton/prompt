@@ -686,6 +686,16 @@ function Get-PodTopMetric {
     )
     $Containers ? (kubectl top pod -n $Namespace --containers) : (kubectl top pod -n $Namespace)
 }
+function Get-NodeTopMetric {
+    <#
+        .SYNOPSIS
+        Return TOP metrics for a pod in a given namespace
+    #>
+    [Alias('knt')]
+    [CmdletBinding()]
+    param()
+    k top node --show-capacity
+}
 function New-PodTrace {
     <#
         .SYNOPSIS
