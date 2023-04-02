@@ -625,6 +625,11 @@ function Get-PodLogStern {
     <#
         .SYNOPSIS
         Get logs of all pods in a namespace using stern utility. https://github.com/stern/stern
+
+        .EXAMPLE
+        kstern mynamespace -Since 10m -State 'running,waiting'
+
+        Return logs for namespace "mynamespace", last 10 minutes, containers in state of running or waiting
     #>
     [Alias('kstern')]
     [CmdletBinding()]
