@@ -604,7 +604,7 @@ function Deploy-PSContainer {
     [Alias('krps')]
     [CmdletBinding()]
     param()
-    kubectl run -it --rm aks-powershell --image=mcr.microsoft.com/powershell:latest -n default
+    kubectl run -it --rm aks-pwsh --image=mcr.microsoft.com/powershell:latest -n default
 }
 function Get-PodLog {
     <#
@@ -616,7 +616,7 @@ function Get-PodLog {
     param(
         [Parameter(Position = 0)]
         [string]$Namespace,
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [string]$Index = 1
     )
     kubectl logs -f (kubectl get pod -n $Namespace -o name | Select-Object -Index $Index) -n $Namespace
@@ -634,21 +634,21 @@ function Get-PodLogStern {
     [Alias('kstern')]
     [CmdletBinding()]
     param(
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [string]$Namespace,
 
         # Pull logs since (use 2h, 5m, etc.). Default: 2h (2 hours)
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [string]$Since = '30m',
 
         # Include only lines container provided regular expression (e.g., "The file uploaded*")
-        [Parameter(Position=2)]
+        [Parameter(Position = 2)]
         [string]$Include,
 
         # Container state to return (running, waiting, terminated, or all)
         # Pass in multiple vai single-stringed, comma-separated (e.g. 'running, waiting')
         # Pass in 'all' to get everything
-        [Parameter(Position=3)]
+        [Parameter(Position = 3)]
         [string]$State = 'running',
 
         # Output log data to JSON format
@@ -662,7 +662,7 @@ function Get-PodLogStern {
             $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json) :
             (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json)
         } else {
-        $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short) :
+            $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short) :
             (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short)
         }
     } else {
@@ -696,6 +696,50 @@ function Get-NodeTopMetric {
     param()
     k top node --show-capacity
 }
+function Get-PodImage {
+    <#
+    .SYNOPSIS
+        Pulls the image value from each pod in a namespace
+
+    .EXAMPLE
+        Get-PodImage namespace
+    #>
+    [Alias('kpi')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position = 0)]
+        [string]$Namespace
+    )
+    if (Get-Command kubectl) {
+        kubectl get pods -n $Namespace -o jsonpath='{range .items[*]}{@.metadata.name}{" "}{@.spec.containers[*].image}{"\n"}{end}'
+    } else {
+        Write-Warning "kubectl not found"
+    }
+}
+function Get-PodResource {
+    <#
+    .SYNOPSIS
+        Pulls the resources attribute of all pods in a namespace
+
+    .EXAMPLE
+        Get-PodImage namespace
+
+        podname1 {"limits":{"cpu":"250m","memory":"768M"},"requests":{"cpu":"20m","memory":"350M"}}
+        podname2 {"limits":{"cpu":"250m","memory":"768M"},"requests":{"cpu":"30m","memory":"400M"}}
+    #>
+    [Alias('kpr')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position = 0)]
+        [string]$Namespace
+    )
+    if (Get-Command kubectl) {
+        # kubectl get pods <pod name> -n jointventure -o jsonpath='{range .spec.containers[*]}{"Container Name: "}{.name}{"\n"}{"Requests:"}{.resources.requests}{"\n"}{"Limits:"}{.resources.limits}{"\n"}{end}'
+        kubectl get pods -n $Namespace -o jsonpath='{range .spec.containers[*]}{"Container: "}{.name}{@.metadata.namespace}{"/"}{@.metadata.name}{" "}{@.spec.containers[*].resources}{"\n"}{end}'
+    } else {
+        Write-Warning "kubectl not found"
+    }
+}
 function New-PodTrace {
     <#
         .SYNOPSIS
@@ -706,11 +750,11 @@ function New-PodTrace {
     [CmdletBinding()]
     param(
         # Pod name to sniff
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [string]$PodName,
 
         # Namespace of pod
-        [Parameter(Position=1)]
+        [Parameter(Position = 1)]
         [string]$Namespace
 
     )
@@ -734,6 +778,7 @@ Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
+Set-Alias -Name code -Value 'code-insiders'
 #endregion shortcuts
 
 <# VS Code Environment #>
