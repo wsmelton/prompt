@@ -16,15 +16,15 @@ try {
     $global:Prompt = @(
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
         Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackgroundColor MediumAquamarine
-        Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White
-        Show-Path -DriveName -ForegroundColor SteelBlue1 -DefaultBackgroundColor RoyalBlue
-        Show-KubeContext -DefaultBackgroundColor White -DefaultForegroundColor Black
-        Show-AzureContext -DefaultBackgroundColor White -DefaultForegroundColor SeaGreen1
+        Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor Aquamarine
+        Show-KubeContext  -DefaultForegroundColor Black
+        Show-AzureContext  -DefaultForegroundColor DarkYellow
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
         }
         Show-Date -Format 'T' -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
+        Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White -Alignment Right
         New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps '',' '
         Set-PSReadLineOption -PromptText (New-Text '❯ ' -Foreground AntiqueWhite4), (New-Text '❯ ' -Foreground 'VioletRed1')
     )
