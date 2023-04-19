@@ -17,8 +17,8 @@ try {
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
         Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackgroundColor MediumAquamarine
         Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor Aquamarine
-        Show-KubeContext  -DefaultForegroundColor Black
-        Show-AzureContext  -DefaultForegroundColor DarkYellow
+        Show-KubeContext
+        Show-AzureContext
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
