@@ -775,7 +775,11 @@ function New-PodTrace {
 #region shortcuts
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
-Set-Alias -Name k -Value kubectl
+if (Get-Command kubecolor -CommandType Application) {
+    Set-Alias -Name k -Value kubecolor
+} else {
+    Set-Alias -Name k -Value kubectl
+}
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name code -Value 'code-insiders'
