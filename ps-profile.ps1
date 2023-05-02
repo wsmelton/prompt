@@ -617,7 +617,7 @@ function Deploy-PSContainer {
     [Alias('krps')]
     [CmdletBinding()]
     param()
-    kubectl run -it --rm aks-pwsh --image=mcr.microsoft.com/powershell:latest -n default
+    k run -it --rm aks-pwsh --image=mcr.microsoft.com/powershell:latest -n default
 }
 function Get-PodLog {
     <#
@@ -632,7 +632,7 @@ function Get-PodLog {
         [Parameter(Position = 1)]
         [string]$Index = 1
     )
-    kubectl logs -f (kubectl get pod -n $Namespace -o name | Select-Object -Index $Index) -n $Namespace
+    k logs -f (kubectl get pod -n $Namespace -o name | Select-Object -Index $Index) -n $Namespace
 }
 function Get-PodLogStern {
     <#
@@ -673,10 +673,10 @@ function Get-PodLogStern {
     if (kubectl krew info stern) {
         if ($Output) {
             $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json) :
-            (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json)
+            (k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json)
         } else {
             $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short) :
-            (kubectl stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short)
+            (k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short)
         }
     } else {
         Write-Warning "Stern utility was not found installed via krew"
@@ -697,7 +697,7 @@ function Get-PodTopMetric {
         # Output details on all containers in the pod
         [switch]$Containers
     )
-    $Containers ? (kubectl top pod -n $Namespace --containers) : (kubectl top pod -n $Namespace)
+    $Containers ? (k top pod -n $Namespace --containers) : (k top pod -n $Namespace)
 }
 function Get-NodeTopMetric {
     <#
@@ -707,7 +707,7 @@ function Get-NodeTopMetric {
     [Alias('knt')]
     [CmdletBinding()]
     param()
-    kubeclt top node --show-capacity
+    k top node --show-capacity
 }
 function Get-PodImage {
     <#
@@ -724,7 +724,7 @@ function Get-PodImage {
         [string]$Namespace
     )
     if (Get-Command kubectl) {
-        kubectl get pods -n $Namespace -o jsonpath='{range .items[*]}{@.metadata.name}{" "}{@.spec.containers[*].image}{"\n"}{end}'
+        k get pods -n $Namespace -o jsonpath='{range .items[*]}{@.metadata.name}{" "}{@.spec.containers[*].image}{"\n"}{end}'
     } else {
         Write-Warning "kubectl not found"
     }
@@ -748,7 +748,7 @@ function Get-PodResource {
     )
     if (Get-Command kubectl) {
         # kubectl get pods <pod name> -n jointventure -o jsonpath='{range .spec.containers[*]}{"Container Name: "}{.name}{"\n"}{"Requests:"}{.resources.requests}{"\n"}{"Limits:"}{.resources.limits}{"\n"}{end}'
-        kubectl get pods -n $Namespace -o jsonpath='{range .spec.containers[*]}{"Container: "}{.name}{@.metadata.namespace}{"/"}{@.metadata.name}{" "}{@.spec.containers[*].resources}{"\n"}{end}'
+        k get pods -n $Namespace -o jsonpath='{range .spec.containers[*]}{"Container: "}{.name}{@.metadata.namespace}{"/"}{@.metadata.name}{" "}{@.spec.containers[*].resources}{"\n"}{end}'
     } else {
         Write-Warning "kubectl not found"
     }
@@ -771,7 +771,7 @@ function New-PodTrace {
         [string]$Namespace
 
     )
-    kubectl sniff $PodName -n $Namespace -o "c:\tmp\$($PodName).tcpdump"
+    k sniff $PodName -n $Namespace -o "c:\tmp\$($PodName).tcpdump"
 }
 #endregion functions
 
