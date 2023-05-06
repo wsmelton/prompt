@@ -479,17 +479,13 @@ function Get-AzureAddressSpace {
     }
 }
 function Get-PopeyeReport {
-    if ((Get-Command popeye -ErrorAction SilentlyContinue) -and (Get-Command kubectl -ErrorAction SilentlyContinue)) {
-        $clusterName = kubectl config view --minify --output 'jsonpath={..context.cluster}'
-        $currentFileDateTime = Get-Date -Format FileDateTime
-        $tempHtmlFileName = "$($clusterName)_$($currentFileDateTime).html"
+    if (Get-Command popeye -ErrorAction SilentlyContinue) {
         try {
             $env:POPEYE_REPORT_DIR = $env:temp
-            popeye -A -c -o 'html' --save --output-file $tempHtmlFileName
+            popeye -A -c -o 'html'
         } catch {
             throw "Issue running popeye: $($_)"
         }
-        Invoke-Item ([IO.Path]::combine($env:temp,$tempHtmlFileName))
     }
 }
 function Test-ADUserPassword {
