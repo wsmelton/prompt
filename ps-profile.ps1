@@ -82,6 +82,15 @@ Set-Alias -Name code -Value 'code-insiders'
 #endregion shortcuts
 
 #region functions
+function GitLog {
+    [Alias('glc')]
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0)]
+        [int]$LineCount = 10
+    )
+    git log --pretty=oneline -$LineCount
+}
 function myrdp {
     [cmdletbinding()]
     param (
