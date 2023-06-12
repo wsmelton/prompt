@@ -40,6 +40,7 @@ $PSDefaultParameterValues = @{
     'Install-Module:Scope'            = 'AllUsers'
     'Install-Module:Repository'       = 'PSGallery'
     'Invoke-Command:HideComputerName' = $true
+    'Connect-AzAccount:AccountId'     = {(Get-AzContext).Account.Id}
 }
 
 if (Get-Module ImportExcel -List) {
@@ -267,10 +268,12 @@ function Find-MissingCommands {
 function Reset-Az {
     param(
         [string]
-        $TenantId
+        $TenantId,
+        [switch]
+        $DeviceAuth
     )
     Clear-AzContext -Force
-    Connect-AzAccount -Tenant $TenantId -WarningAction SilentlyContinue >$null
+    Connect-AzAccount -UseDeviceAuthentication:$DeviceAuth -Tenant $TenantId -WarningAction SilentlyContinue >$null
     Get-AzContext -ListAvailable | ForEach-Object { $n = $_.Name; Rename-AzContext -SourceName $n -TargetName $n.Split(' ')[0] }
     Save-AzContext -Path $azContextImport -Force
 
