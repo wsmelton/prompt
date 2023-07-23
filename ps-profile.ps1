@@ -77,7 +77,7 @@ if (Get-Module Az.Accounts -ListAvailable) {
 #region shortcuts
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
-if (Get-Command kubecolor -CommandType Application) {
+if (Get-Command kubecolor -CommandType Application -ErrorAction SilentlyContinue) {
     Set-Alias -Name k -Value kubecolor
 } else {
     Set-Alias -Name k -Value kubectl
@@ -746,7 +746,7 @@ function Get-PodImage {
         [Parameter(Position = 0)]
         [string]$Namespace
     )
-    if (Get-Command kubectl) {
+    if (Get-Command kubectl -ErrorAction SilentlyContinue) {
         k get pods -n $Namespace -o jsonpath='{range .items[*]}{@.metadata.name}{" "}{@.spec.containers[*].image}{"\n"}{end}'
     } else {
         Write-Warning "kubectl not found"
@@ -769,7 +769,7 @@ function Get-PodResource {
         [Parameter(Position = 0)]
         [string]$Namespace
     )
-    if (Get-Command kubectl) {
+    if (Get-Command kubectl -ErrorAction SilentlyContinue) {
         # kubectl get pods <pod name> -n jointventure -o jsonpath='{range .spec.containers[*]}{"Container Name: "}{.name}{"\n"}{"Requests:"}{.resources.requests}{"\n"}{"Limits:"}{.resources.limits}{"\n"}{end}'
         k get pods -n $Namespace -o jsonpath='{range .spec.containers[*]}{"Container: "}{.name}{@.metadata.namespace}{"/"}{@.metadata.name}{" "}{@.spec.containers[*].resources}{"\n"}{end}'
     } else {
