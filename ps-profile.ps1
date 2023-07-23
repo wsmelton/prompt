@@ -25,8 +25,13 @@ try {
         }
         Show-Date -Format 'T' -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
         Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White -Alignment Right
-        New-TerminalBlock '❯' -ForegroundColor 'Gray80' -Caps '',' '
-        Set-PSReadLineOption -PromptText (New-Text '❯ ' -Foreground AntiqueWhite4), (New-Text '❯ ' -Foreground 'VioletRed1')
+        if ($PSEdition -eq 'Desktop') {
+            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
+            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
+        } else {
+            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
+            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
+        }
     )
     function global:Prompt { -join $Prompt }
 } catch {
@@ -680,11 +685,17 @@ function Get-PodLogStern {
     )
     if (kubectl krew info stern) {
         if ($Output) {
-            $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json) :
-            (k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json)
+            if ($Include) {
+                kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json
+            } else {
+                k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json
+            }
         } else {
-            $Include ? (kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short) :
-            (k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short)
+            if ($Include) {
+                kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short
+            } else {
+              k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short
+            }
         }
     } else {
         Write-Warning "Stern utility was not found installed via krew"
@@ -705,7 +716,11 @@ function Get-PodTopMetric {
         # Output details on all containers in the pod
         [switch]$Containers
     )
-    $Containers ? (k top pod -n $Namespace --containers) : (k top pod -n $Namespace)
+    if ($Containers) {
+        k top pod -n $Namespace --containers
+    } else {
+        k top pod -n $Namespace
+    }
 }
 function Get-NodeTopMetric {
     <#
