@@ -45,7 +45,7 @@ $PSDefaultParameterValues = @{
     'Install-Module:Scope'            = 'AllUsers'
     'Install-Module:Repository'       = 'PSGallery'
     'Invoke-Command:HideComputerName' = $true
-    'Connect-AzAccount:AccountId'     = {(Get-AzContext).Account.Id}
+    'Connect-AzAccount:AccountId'     = { (Get-AzContext).Account.Id }
 }
 
 if (Get-Module ImportExcel -List) {
@@ -77,11 +77,7 @@ if (Get-Module Az.Accounts -ListAvailable) {
 #region shortcuts
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
-if (Get-Command kubecolor -CommandType Application -ErrorAction SilentlyContinue) {
-    Set-Alias -Name k -Value kubecolor
-} else {
-    Set-Alias -Name k -Value kubectl
-}
+Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name code -Value 'code-insiders'
@@ -92,12 +88,12 @@ function GitLog {
     [Alias('glc')]
     [CmdletBinding()]
     param(
-        [Parameter(Position=0)]
+        [Parameter(Position = 0)]
         [int]$LineCount = 10
     )
     git log --pretty=oneline -$LineCount
 }
-function myrdp {
+function myRdp {
     [cmdletbinding()]
     param (
         $server,
@@ -694,7 +690,7 @@ function Get-PodLogStern {
             if ($Include) {
                 kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short
             } else {
-              k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short
+                k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short
             }
         }
     } else {
