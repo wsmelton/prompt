@@ -1,11 +1,12 @@
 param(
     [switch]$NoK8s
 )
+
 if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     throw "This script needs to be run As Admin"
 }
 
-if ($psedition -eq 'Core') {
+if ($PSEdition -eq 'Core') {
     if (-not (Get-InstalledScript Install-RequiredModule)) {
         try {
             Install-Script Install-RequiredModule -Repository PSGallery -Force
@@ -24,47 +25,47 @@ if ($psedition -eq 'Core') {
 }
 
 try {
-    Install-RequiredModule -RequiredModulesFile $PSScriptRoot\requiredmodules.psd1 -TrustRegisteredRepositories -Scope AllUsers -Quiet
+    Install-RequiredModule -RequiredModulesFile $PSScriptRoot\requiredmodules.psd1 -TrustRegisteredRepositories -Scope CurrentUser -Quiet
 } catch {
     throw "Issue installing required modules: $($_)"
 }
 
-<# Make sure Chocolatey is installed #>
-try {
-    $chocoDetail = Get-Command choco -CommandType Application -ErrorAction Stop
-    if ($chocoDetail) {
-        Write-Host "Choco version detected as: $(choco --version)"
+if (-not $IsMacOS) {
+    <# Make sure Chocolatey is installed #>
+    try {
+        $chocoDetail = Get-Command choco -CommandType Application -ErrorAction Stop
+        if ($chocoDetail) {
+            Write-Host "Choco version detected as: $(choco --version)"
+        }
+    } catch {
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
     }
-} catch {
-    Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-}
 
-if ($PSBoundParameters.ContainsKey('NoK8s')) {
-    Write-Host 'Skipping install of Kubernetes tools'
-} else {
-    if ($chocoDetail) {
-        # install some stuff for Kubernetes management
-        Write-Output "Installing Kubernetes tools"
-        choco install kubernetes-cli --limitoutput --yes
-        choco install kubectx --limitoutput --yes
-        choco install kubens --limitoutput --yes
-        choco install k9s --limitoutput --yes
-
-        Write-Output "Do not forget to install Popeye as well: https://github.com/derailed/popeye/releases"
+    if ($PSBoundParameters.ContainsKey('NoK8s')) {
+        Write-Host 'Skipping install of Kubernetes tools'
+    } else {
+        if ($chocoDetail) {
+            # install some stuff for Kubernetes management
+            Write-Output "Installing Kubernetes tools"
+            choco install kubernetes-cli --limitoutput --yes
+            choco install kubectx --limitoutput --yes
+            choco install kubens --limitoutput --yes
+            choco install k9s --limitoutput --yes
+            Write-Output "Do not forget to install Popeye as well: https://github.com/derailed/popeye/releases"
+        }
     }
-}
 
-# install of basics
-if (-not (Get-Command bicep -CommandType Application -ErrorAction SilentlyContinue)) {
-    choco install bicep --limitoutput --yes
-}
+    # install of basics
+    if (-not (Get-Command bicep -CommandType Application -ErrorAction SilentlyContinue)) {
+        choco install bicep --limitoutput --yes
+    }
 
-if (-not (Get-Command git -CommandType Application -ErrorAction SilentlyContinue)) {
-    choco install git --limitoutput --yes
-}
-
-if (-not (Get-Command wt -CommandType Application -ErrorAction SilentlyContinue)) {
-    choco install windows.terminal --limitoutput --yes
+    if (-not (Get-Command git -CommandType Application -ErrorAction SilentlyContinue)) {
+        choco install git --limitoutput --yes
+    }
+    if (-not (Get-Command wt -CommandType Application -ErrorAction SilentlyContinue)) {
+        choco install windows.terminal --limitoutput --yes
+    }
 }
 
 # setup initial Secret vault, adjust the configuration as you want or need for security purposes
