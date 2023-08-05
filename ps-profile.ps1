@@ -42,8 +42,6 @@ try {
 $ProgressPreference = 'SilentlyContinue'
 
 $PSDefaultParameterValues = @{
-    'Install-Module:Scope'            = 'CurrentUsers'
-    'Install-Module:Repository'       = 'PSGallery'
     'Invoke-Command:HideComputerName' = $true
     'Connect-AzAccount:AccountId'     = { (Get-AzContext).Account.Id }
 }
