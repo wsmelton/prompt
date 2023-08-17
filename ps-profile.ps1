@@ -87,9 +87,16 @@ function GitLog {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
-        [int]$LineCount = 10
+        [int]$LineCount = 10,
+
+        [Parameter(Position = 1)]
+        [string]$FilePath
     )
-    git log --pretty=oneline -$LineCount
+    if ($FilePath) {
+        git log --pretty=oneline --all --full-history -- $FilePath
+    } else {
+        git log --pretty=oneline -$LineCount
+    }
 }
 if (-not $IsMacOS) {
     function myRdp {
