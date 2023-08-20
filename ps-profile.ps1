@@ -371,7 +371,6 @@ function findshit ($str,$path) {
     $str = [regex]::escape($str)
     Select-String -Pattern $str -Path (Get-ChildItem $path -Recurse -Exclude 'allcommands.ps1', '*.dll', '*psproj')
 }
-
 function Reset-Az {
     param(
         [string]
@@ -803,7 +802,7 @@ function New-PodTrace {
 #endregion functions
 
 #Import-Module Az.Tools.Predictor
-#Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 
 # if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
 #     $data = Get-Content $azContextImport | ConvertFrom-Json
