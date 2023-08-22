@@ -799,6 +799,84 @@ function New-PodTrace {
     )
     k sniff $PodName -n $Namespace -o "c:\tmp\$($PodName).tcpdump"
 }
+function Get-AzureKeyVaultSecret {
+    <#
+    .SYNOPSIS
+    Retrieve a Secret's value from an Azure Key Vault
+
+    .DESCRIPTION
+    Provided an existing Key Vault will grant the Username the Key Vault Secrets User RBAC role.
+    After pulling the Secret value(s) will then remove the RBAC role assignment.
+
+    .EXAMPLE
+    Get-AzureKeyVaultSecret myname@company.com kvwhatever whatever-rg mysecert, mysecret2
+
+    Grant Key Vault Secrets User to the key vault and retrieves each secret name
+    #>
+    [Alias('akvs')]
+    [CmdletBinding()]
+    param(
+        # The username/identity to grant the role assignment
+        [Parameter(Position = 0)]
+        [string]$Username,
+
+        # Key Vault name holding the secret
+        [Parameter(Position = 1)]
+        [string]$KeyVaultName,
+
+        # Resource Group name of the Key Vault
+        [Parameter(Position = 2)]
+        [string]$ResourceGroupName,
+
+        # Secret name(s) to retrieve plain text values
+        [Parameter(Position = 3)]
+        [string[]]$SecretName
+    )
+
+    try {
+        $kv = Get-AzKeyVault -ResourceGroupName $ResourceGroupName -VaultName $KeyVaultName -ErrorAction Stop
+        Write-Verbose ($kv | Out-String)
+    } catch {
+        throw "Unable to pull the Key Vault $($_)"
+    }
+    <# Grant Key Vault Secrets User #>
+    $roleParams = @{
+        SignInName         = $Username
+        RoleDefinitionName = 'Key Vault Secrets User'
+        Scope              = $kv.ResourceId
+        ErrorAction        = 'Stop'
+    }
+    try {
+        $azRoleAssigned = New-AzRoleAssignment @roleParams
+        Write-Verbose ($azRoleAssigned | Out-String)
+        Start-Sleep -Seconds 4
+    } catch {
+        throw "Unable to create role assignment: $($_)"
+    }
+
+    foreach ($secert in $SecretName) {
+        try {
+            $plainTextValue = Get-AzKeyVaultSecret -VaultName $kv.VaultName -Name $secert -AsPlainText
+        } catch {
+            throw "Unable to retrieve secret [$secert]: $($_)"
+        }
+        if ([string]::IsNullOrEmpty($plainTextValue)) {
+            Write-Warning "No value found in the secret [$secret]"
+        } else {
+            [pscustomobject]@{
+                KeyVaultName = $kv.VaultName
+                SecretName   = $secert
+                Value        = $plainTextValue
+            }
+        }
+    }
+
+    try {
+        Remove-AzRoleAssignment @roleParams >$null
+    } catch {
+        throw "Unable to remove the role assignment: $($_)"
+    }
+}
 #endregion functions
 
 #Import-Module Az.Tools.Predictor
