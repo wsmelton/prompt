@@ -15,16 +15,16 @@ try {
 
     $global:Prompt = @(
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
-        Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackgroundColor MediumAquamarine
-        Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor Aquamarine
+        Show-HistoryId -Prefix '#' -DefaultForegroundColor Gold -DefaultBackgroundColor MediumSlateBlue
+        Show-ElapsedTime -Prefix '' -ForegroundColor Orchid1 -BackgroundColor Black
+        Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor SeaGreen1
         Show-KubeContext -Prefix "😇"
         Show-AzureContext -Prefix "🦾"
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
         }
-        Show-Date -Format 'T' -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
-        Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White -Alignment Right
+        Show-Date -Format 'hh:mm:sss [yyyy-MM-dd]' -ForegroundColor Orchid1 -BackgroundColor Black -Alignment Right
         if ($PSEdition -eq 'Desktop') {
             New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
             Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
@@ -87,7 +87,7 @@ function GitLog {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
-        [int]$LineCount = 10,
+        [int]$LineCount = 5,
 
         [Parameter(Position = 1)]
         [string]$FilePath
