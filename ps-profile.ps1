@@ -6,6 +6,7 @@ using namespace Microsoft.Azure.Commands.ContainerRegistry.Models
 try {
     Import-Module TerminalBlocks -ErrorAction Stop
     Import-Module posh-git -ErrorAction Stop
+
     $global:GitPromptSettings = New-GitPromptSettings
     $global:GitPromptSettings.BeforeStatus = ''
     $global:GitPromptSettings.AfterStatus = ''
@@ -14,6 +15,10 @@ try {
     $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
 
     $global:Prompt = @(
+        # Initialize-Prompt
+        [PoshCode.TerminalBlock]::LastSuccess = $global:?
+        [PoshCode.TerminalBlock]::LastExitCode = $global:LASTEXITCODE
+
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
         Show-HistoryId -Prefix '#' -DefaultForegroundColor Gold -DefaultBackgroundColor MediumSlateBlue
         Show-ElapsedTime -Prefix '' -ForegroundColor Orchid1 -BackgroundColor Black
@@ -24,14 +29,13 @@ try {
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
         }
-        Show-Date -Format 'hh:mm:sss [yyyy-MM-dd]' -ForegroundColor Orchid1 -BackgroundColor Black -Alignment Right
-        if ($PSEdition -eq 'Desktop') {
-            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
-            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
-        } else {
-            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
-            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
-        }
+        Show-Date -Format 'hh:mm:sss yyyy-MM-dd' -ForegroundColor Orchid1 -BackgroundColor Black -Alignment Right
+
+        New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
+        Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
+
+        # Exit-Prompt
+        $global:LASTEXITCODE = [PoshCode.TerminalBlock]::LastExitCode
     )
     function global:Prompt { -join $Prompt }
 } catch {
