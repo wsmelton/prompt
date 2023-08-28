@@ -47,7 +47,6 @@ $ProgressPreference = 'SilentlyContinue'
 
 $PSDefaultParameterValues = @{
     'Invoke-Command:HideComputerName' = $true
-    'Connect-AzAccount:AccountId'     = { (Get-AzContext).Account.Id }
 }
 
 if (Get-Module ImportExcel -List) {
