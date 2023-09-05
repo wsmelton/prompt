@@ -22,13 +22,13 @@ try {
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
         Show-HistoryId -Prefix '#' -DefaultForegroundColor Gold -DefaultBackgroundColor MediumSlateBlue
         Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor SeaGreen1
+        Show-ElapsedTime -Prefix '' -ForegroundColor SeaGreen1 -BackgroundColor Black
         Show-KubeContext -Prefix "😇"
         Show-AzureContext -Prefix "🦾"
 
         if (Get-Module posh-git) {
             Show-PoshGitStatus -AfterStatus ' ' -PathStatusSeparator '' -Caps ''
         }
-        Show-ElapsedTime -Prefix '' -ForegroundColor SeaGreen1 -BackgroundColor Black
         Show-Date -Format 'hh:mm:sss yyyy-MM-dd' -ForegroundColor Orchid1 -BackgroundColor Black -Alignment Right
 
         New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
@@ -71,7 +71,7 @@ if ($psedition -ne 'Core' -and -not $IsMacOS) {
     [System.Net.ServicePointManager]::SecurityProtocol = @('Tls12', 'Tls11', 'Tls', 'Ssl3')
 }
 
-if (Get-Module Az.Accounts -ListAvailable) {
+if (Test-Path "$env:USERPROFILE\azure-context.json") {
     $azContextImport = "$env:USERPROFILE\azure-context.json"
 }
 
