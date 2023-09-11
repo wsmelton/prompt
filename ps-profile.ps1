@@ -624,7 +624,7 @@ function Open-AksResources {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
-        [ValidateSet('dv1','qa1','sg1','rprd')]
+        [ValidateSet('sl1','dv1','qa1','sg1','rprd')]
         [string]$EnvCode
     )
     $clusterName = "aks-loandepotdev-azusw2-dvo-$EnvCode"
