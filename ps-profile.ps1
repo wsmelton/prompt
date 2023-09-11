@@ -615,23 +615,6 @@ function findLocalAdmins {
     }
 }
 # Kubernetes
-function Open-AksResources {
-    <#
-        .SYNOPSIS
-        Opens up the Workload panel of the AKS Cluster in the specified environment.
-    #>
-    [Alias('akswl')]
-    [CmdletBinding()]
-    param(
-        [Parameter(Position = 0)]
-        [ValidateSet('sl1','dv1','qa1','sg1','rprd')]
-        [string]$EnvCode
-    )
-    $clusterName = "aks-loandepotdev-azusw2-dvo-$EnvCode"
-    $rgName = "rg-loandepotdev-azusw2-dvo-$EnvCode"
-    Write-Verbose "Opening Workloads panel for $clusterName"
-    az aks browse --name $clusterName --resource-group $rgName --subscription "sb-azu-dvo-$EnvCode"
-}
 function Deploy-PSContainer {
     [Alias('krps')]
     [CmdletBinding()]
