@@ -620,7 +620,7 @@ function Open-AksResources {
         .SYNOPSIS
         Opens up the Workload panel of the AKS Cluster in the specified environment.
     #>
-    [Alias('aksp')]
+    [Alias('akswl')]
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
