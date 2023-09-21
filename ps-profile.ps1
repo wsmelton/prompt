@@ -810,57 +810,70 @@ function Get-AzureKeyVaultSecret {
         [Parameter(Position = 1)]
         [string]$KeyVaultName,
 
-        # Resource Group name of the Key Vault
-        [Parameter(Position = 2)]
-        [string]$ResourceGroupName,
-
         # Secret name(s) to retrieve plain text values
+        [Parameter(Position = 2)]
+        [string[]]$SecretName,
+
+        # Just list the secrets
         [Parameter(Position = 3)]
-        [string[]]$SecretName
+        [switch]$ListOnly
     )
-
-    try {
-        $kv = Get-AzKeyVault -ResourceGroupName $ResourceGroupName -VaultName $KeyVaultName -ErrorAction Stop
-        Write-Verbose ($kv | Out-String)
-    } catch {
-        throw "Unable to pull the Key Vault $($_)"
-    }
-    <# Grant Key Vault Secrets User #>
-    $roleParams = @{
-        SignInName         = $Username
-        RoleDefinitionName = 'Key Vault Secrets User'
-        Scope              = $kv.ResourceId
-        ErrorAction        = 'Stop'
-    }
-    try {
-        $azRoleAssigned = New-AzRoleAssignment @roleParams
-        Write-Verbose ($azRoleAssigned | Out-String)
-        Start-Sleep -Seconds 4
-    } catch {
-        throw "Unable to create role assignment: $($_)"
-    }
-
-    foreach ($secert in $SecretName) {
+    begin {
         try {
-            $plainTextValue = Get-AzKeyVaultSecret -VaultName $kv.VaultName -Name $secert -AsPlainText
+            $keyVault = Get-AzKeyVault -VaultName $KeyVaultName -ErrorAction Stop
+            Write-Verbose ($kv | Out-String)
         } catch {
-            throw "Unable to retrieve secret [$secert]: $($_)"
+            throw "Unable to pull the Key Vault $($_)"
         }
-        if ([string]::IsNullOrEmpty($plainTextValue)) {
-            Write-Warning "No value found in the secret [$secret]"
-        } else {
-            [pscustomobject]@{
-                KeyVaultName = $kv.VaultName
-                SecretName   = $secert
-                Value        = $plainTextValue
-            }
+        <# Grant Key Vault Secrets User #>
+        $roleParams = @{
+            SignInName         = $Username
+            RoleDefinitionName = 'Key Vault Secrets User'
+            Scope              = $keyVault.ResourceId
+            ErrorAction        = 'Stop'
+        }
+        try {
+            $azRoleAssigned = New-AzRoleAssignment @roleParams
+            Write-Verbose ($azRoleAssigned | Out-String)
+            Start-Sleep -Seconds 4
+        } catch {
+            throw "Unable to create role assignment: $($_)"
+        }
+        try {
+            $kvSecrets = Get-AzKeyVaultSecret -VaultName $keyVault.VaultName
+        } catch {
+            throw "Unable to retrieve secrets: $($_)"
         }
     }
-
-    try {
+    process {
+        if ($kvSecrets) {
+            if ($ListOnly) {
+                $kvSecrets
+            }
+            if (-not $ListOnly) {
+                foreach ($secert in $SecretName) {
+                    try {
+                        $plainTextValue = Get-AzKeyVaultSecret -VaultName $kv.VaultName -Name $secert -AsPlainText
+                    } catch {
+                        throw "Unable to retrieve secret [$secert]: $($_)"
+                    }
+                    if ([string]::IsNullOrEmpty($plainTextValue)) {
+                        Write-Warning "No value found in the secret [$secret]"
+                    } else {
+                        [pscustomobject]@{
+                            KeyVaultName = $kv.VaultName
+                            SecretName   = $secert
+                            Value        = $plainTextValue
+                        }
+                    }
+                }
+            }
+        } else {
+            Write-Warning "No secrets found in vault $($keyVault.VaultName)"
+        }
+    }
+    end {
         Remove-AzRoleAssignment @roleParams >$null
-    } catch {
-        throw "Unable to remove the role assignment: $($_)"
     }
 }
 #endregion functions
