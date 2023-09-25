@@ -790,32 +790,24 @@ function Get-AzureKeyVaultSecret {
     .SYNOPSIS
     Retrieve a Secret's value from an Azure Key Vault
 
-    .DESCRIPTION
-    Provided an existing Key Vault will grant the Username the Key Vault Secrets User RBAC role.
-    After pulling the Secret value(s) will then remove the RBAC role assignment.
-
     .EXAMPLE
-    Get-AzureKeyVaultSecret myname@company.com kvwhatever mysecert, mysecret2
+    Get-AzureKeyVaultSecret kvwhatever mysecert, mysecret2
 
     Grant Key Vault Secrets User to the key vault and retrieves each secret name
     #>
     [Alias('akvs')]
     [CmdletBinding()]
     param(
-        # The username/identity to grant the role assignment
-        [Parameter(Position = 0)]
-        [string]$Username,
-
         # Key Vault name holding the secret
-        [Parameter(Position = 1)]
+        [Parameter(Position = 0)]
         [string]$KeyVaultName,
 
         # Secret name(s) to retrieve plain text values
-        [Parameter(Position = 2)]
+        [Parameter(Position = 1)]
         [string[]]$SecretName,
 
         # Just list the secrets
-        [Parameter(Position = 3)]
+        [Parameter(Position = 2)]
         [switch]$ListOnly
     )
     try {
@@ -825,19 +817,19 @@ function Get-AzureKeyVaultSecret {
         throw "Unable to pull the Key Vault $($_)"
     }
     <# Grant Key Vault Secrets User #>
-    $roleParams = @{
-        SignInName         = $Username
-        RoleDefinitionName = 'Key Vault Secrets User'
-        Scope              = $keyVault.ResourceId
-        ErrorAction        = 'Stop'
-    }
-    try {
-        $azRoleAssigned = New-AzRoleAssignment @roleParams
-        Write-Verbose ($azRoleAssigned | Out-String)
-        Start-Sleep -Seconds 4
-    } catch {
-        throw "Unable to create role assignment: $($_)"
-    }
+    # $roleParams = @{
+    #     SignInName         = $Username
+    #     RoleDefinitionName = 'Key Vault Secrets User'
+    #     Scope              = $keyVault.ResourceId
+    #     ErrorAction        = 'Stop'
+    # }
+    # try {
+    #     $azRoleAssigned = New-AzRoleAssignment @roleParams
+    #     Write-Verbose ($azRoleAssigned | Out-String)
+    #     Start-Sleep -Seconds 4
+    # } catch {
+    #     throw "Unable to create role assignment: $($_)"
+    # }
     try {
         $kvSecrets = Get-AzKeyVaultSecret -VaultName $keyVault.VaultName -ErrorAction Stop
         if ($kvSecrets) {
