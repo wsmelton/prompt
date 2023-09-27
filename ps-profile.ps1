@@ -802,7 +802,9 @@ function New-PodTrace {
 #endregion functions
 
 #Import-Module Az.Tools.Predictor
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+if ($PSEdition -eq 'Core') {
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+}
 
 # if ((Test-Path $azContextImport) -and (Get-Module Az.Accounts -ListAvailable)) {
 #     $data = Get-Content $azContextImport | ConvertFrom-Json
