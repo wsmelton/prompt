@@ -6,6 +6,7 @@ using namespace Microsoft.Azure.Commands.ContainerRegistry.Models
 try {
     Import-Module TerminalBlocks -ErrorAction Stop
     Import-Module posh-git -ErrorAction Stop
+
     $global:GitPromptSettings = New-GitPromptSettings
     $global:GitPromptSettings.BeforeStatus = ''
     $global:GitPromptSettings.AfterStatus = ''
@@ -14,24 +15,27 @@ try {
     $global:GitPromptSettings.AfterStash.Text = "$(Text '&Separator;')"
 
     $global:Prompt = @(
+        # Initialize-Prompt
+        [PoshCode.TerminalBlock]::LastSuccess = $global:?
+        [PoshCode.TerminalBlock]::LastExitCode = $global:LASTEXITCODE
+
         Show-LastExitCode -ForegroundColor 'VioletRed1' -Caps '',"`n"
-        Show-HistoryId -Prefix '#' -DefaultForegroundColor Black -DefaultBackgroundColor MediumAquamarine
-        Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor Aquamarine
+        Show-HistoryId -Prefix '#' -DefaultForegroundColor Gold -DefaultBackgroundColor MediumSlateBlue
+        Show-Path -DriveName -ForegroundColor Black -DefaultBackgroundColor SeaGreen1
+        Show-ElapsedTime -Prefix '' -ForegroundColor SeaGreen1 -BackgroundColor Black
         Show-KubeContext -Prefix "😇"
         Show-AzureContext -Prefix "🦾"
 
         if (Get-Module posh-git) {
-            Show-PoshGitStatus -AfterStatus '' -PathStatusSeparator '' -Caps ''
+            Show-PoshGitStatus -AfterStatus ' ' -PathStatusSeparator '' -Caps ''
         }
-        Show-Date -Format 'T' -ForegroundColor Black -BackgroundColor GoldenRod -Alignment Right
-        Show-ElapsedTime -Prefix '' -ForegroundColor Black -DefaultBackgroundColor White -Alignment Right
-        if ($PSEdition -eq 'Desktop') {
-            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
-            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
-        } else {
-            New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
-            Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
-        }
+        Show-Date -Format 'hh:mm:sss yyyy-MM-dd' -ForegroundColor Orchid1 -BackgroundColor Black -Alignment Right
+
+        New-TerminalBlock '>' -ForegroundColor 'Gray80' -Caps '',' '
+        Set-PSReadLineOption -PromptText (New-Text '>> ' -Foreground AntiqueWhite4), (New-Text '> ' -Foreground 'VioletRed1')
+
+        # Exit-Prompt
+        $global:LASTEXITCODE = [PoshCode.TerminalBlock]::LastExitCode
     )
     function global:Prompt { -join $Prompt }
 } catch {
@@ -43,7 +47,6 @@ $ProgressPreference = 'SilentlyContinue'
 
 $PSDefaultParameterValues = @{
     'Invoke-Command:HideComputerName' = $true
-    'Connect-AzAccount:AccountId'     = { (Get-AzContext).Account.Id }
 }
 
 if (Get-Module ImportExcel -List) {
@@ -68,7 +71,7 @@ if ($psedition -ne 'Core' -and -not $IsMacOS) {
     [System.Net.ServicePointManager]::SecurityProtocol = @('Tls12', 'Tls11', 'Tls', 'Ssl3')
 }
 
-if (Get-Module Az.Accounts -ListAvailable) {
+if (Test-Path "$env:USERPROFILE\azure-context.json") {
     $azContextImport = "$env:USERPROFILE\azure-context.json"
 }
 
@@ -87,7 +90,7 @@ function GitLog {
     [CmdletBinding()]
     param(
         [Parameter(Position = 0)]
-        [int]$LineCount = 10,
+        [int]$LineCount = 5,
 
         [Parameter(Position = 1)]
         [string]$FilePath
@@ -612,23 +615,6 @@ function findLocalAdmins {
     }
 }
 # Kubernetes
-function Open-AksResources {
-    <#
-        .SYNOPSIS
-        Opens up the Workload panel of the AKS Cluster in the specified environment.
-    #>
-    [Alias('aksp')]
-    [CmdletBinding()]
-    param(
-        [Parameter(Position = 0)]
-        [ValidateSet('dv1','qa1','sg1','rprd')]
-        [string]$EnvCode
-    )
-    $clusterName = "aks-loandepotdev-azusw2-dvo-$EnvCode"
-    $rgName = "rg-loandepotdev-azusw2-dvo-$EnvCode"
-    Write-Verbose "Opening Workloads panel for $clusterName"
-    az aks browse --name $clusterName --resource-group $rgName --subscription "sb-azu-dvo-$EnvCode"
-}
 function Deploy-PSContainer {
     [Alias('krps')]
     [CmdletBinding()]
@@ -798,6 +784,80 @@ function New-PodTrace {
 
     )
     k sniff $PodName -n $Namespace -o "c:\tmp\$($PodName).tcpdump"
+}
+function Get-AzureKeyVaultSecret {
+    <#
+    .SYNOPSIS
+    Retrieve a Secret's value from an Azure Key Vault
+
+    .EXAMPLE
+    Get-AzureKeyVaultSecret kvwhatever mysecert, mysecret2
+
+    Grant Key Vault Secrets User to the key vault and retrieves each secret name
+    #>
+    [Alias('akvs')]
+    [CmdletBinding()]
+    param(
+        # Key Vault name holding the secret
+        [Parameter(Position = 0)]
+        [string]$KeyVaultName,
+
+        # Secret name(s) to retrieve plain text values
+        [Parameter(Position = 1)]
+        [string[]]$SecretName,
+
+        # Just list the secrets
+        [Parameter(Position = 2)]
+        [switch]$ListOnly
+    )
+    try {
+        $keyVault = Get-AzKeyVault -VaultName $KeyVaultName -ErrorAction Stop
+        Write-Verbose ($kv | Out-String)
+    } catch {
+        throw "Unable to pull the Key Vault $($_)"
+    }
+    <# Grant Key Vault Secrets User #>
+    # $roleParams = @{
+    #     SignInName         = $Username
+    #     RoleDefinitionName = 'Key Vault Secrets User'
+    #     Scope              = $keyVault.ResourceId
+    #     ErrorAction        = 'Stop'
+    # }
+    # try {
+    #     $azRoleAssigned = New-AzRoleAssignment @roleParams
+    #     Write-Verbose ($azRoleAssigned | Out-String)
+    #     Start-Sleep -Seconds 4
+    # } catch {
+    #     throw "Unable to create role assignment: $($_)"
+    # }
+    try {
+        $kvSecrets = Get-AzKeyVaultSecret -VaultName $keyVault.VaultName -ErrorAction Stop
+        if ($kvSecrets) {
+            if ($ListOnly) {
+                $kvSecrets
+            } else {
+                $secrets = $kvSecrets.Where({ $_.Name -in $SecretName })
+                foreach ($secret in $secrets) {
+                    $plainTextValue = Get-AzKeyVaultSecret -VaultName $keyVault.VaultName -Name $secret.Name -AsPlainText -ErrorAction Stop
+                    if ([string]::IsNullOrEmpty($plainTextValue)) {
+                        Write-Warning "No value found in the secret [$($secret.Name)]"
+                    } else {
+                        [pscustomobject]@{
+                            KeyVaultName = $keyVault.VaultName
+                            SecretName   = $secret.Name
+                            Value        = $plainTextValue
+                        }
+                    }
+                }
+            }
+        } else {
+            Write-Warning "No secrets found in vault $($keyVault.VaultName)"
+        }
+    } catch {
+        throw "Issue retrieving secret: $($_)"
+    } finally {
+        Remove-AzRoleAssignment @roleParams >$null
+    }
 }
 #endregion functions
 
