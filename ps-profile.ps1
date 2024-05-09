@@ -79,9 +79,6 @@ if (Test-Path "$env:USERPROFILE\azure-context.json") {
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
-Set-Alias -Name kg -Value "kubectl get"
-Set-Alias -Name kd -Value "kubectl describe"
-Set-Alias -Name kl -Value "kubectl logs"
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name code -Value 'code-insiders'
