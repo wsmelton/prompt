@@ -36,7 +36,12 @@ I prefer to store modules under the AllUsers scope so those files are not consta
 After running the init process above, open your PowerShell profile (e.g., `notepad $profile`), and add the line below.
 
 > Adjust the path based on where you cloned this repository to your local machine
-
 ```console
 . c:\git\prompt\ps-profile.ps1
 ```
+
+### Reminders
+
+> Things I'll never remember every time I setup a new device/machine
+Conda - SSL proxy issues, create `.condarc` with `ssl_verify: {path to PEM file}`
+
