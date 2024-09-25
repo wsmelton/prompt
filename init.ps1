@@ -31,6 +31,7 @@ try {
 }
 if ($IsMacOS) {
     #TODO install these from brew
+    # install PowerShell using package install from PS team
     <#
         #kubectl krew plugins
         ctx
@@ -42,6 +43,25 @@ if ($IsMacOS) {
         validate
         status
     #>
+    <# 
+        # bicep 
+        brew tap azure/bicep
+        brew install bicep
+        brew install jq
+        brew install helm
+        brew install git
+
+        # can't remember install but miniconda3 for python versions (use this with Azure CLI)
+        # create env using {conda env list}
+        # conda config --set ssl_verify ~/cacert.pem
+    #>
+    <#
+    # specific version of kubectl?
+    curl -LO "https://dl.k8s.io/release/v1.26.3/bin/darwin/arm64/kubectl"
+    ls -la
+    chmod +x ./kubectl
+    sudo mv ./kubectl /usr/local/bin/kubectl
+    sudo chown root: /usr/local/bin/kubectl
     
 }
 if (-not $IsMacOS) {
