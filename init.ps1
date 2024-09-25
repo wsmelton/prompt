@@ -29,7 +29,21 @@ try {
 } catch {
     throw "Issue installing required modules: $($_)"
 }
-
+if ($IsMacOS) {
+    #TODO install these from brew
+    <#
+        #kubectl krew plugins
+        ctx
+        foreach
+        ns
+        sniff
+        status
+        stern
+        validate
+        status
+    #>
+    
+}
 if (-not $IsMacOS) {
     <# Make sure Chocolatey is installed #>
     try {
