@@ -21,7 +21,7 @@ if (-not (Get-Module ModuleFast)) {
 }
 
 try {
-    Install-ModuleFast -Path $PSScriptRoot\requiredmodules.psd1
+    Install-ModuleFast -Path $PSScriptRoot/requiredmodules.psd1 -Verbose
 } catch {
     throw "Issue installing required modules: $($_)"
 }
