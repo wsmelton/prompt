@@ -107,13 +107,17 @@ try {
         } else {
             Write-Host 'Secret Store authentication already set to [None]'
         }
-        if (-not (Get-SecretVault -Name myCredentials)) {
+        if (-not (Get-SecretVault -Name myCredentials -ErrorAction SilentlyContinue)) {
             Register-SecretVault -Name myCredentials -ModuleName Microsoft.PowerShell.SecretStore -DefaultVault
         } else {
             Write-Warning 'Secret vault [myCredentials] already exists'
         }
 
-        Write-Host 'Vault [myCredentials] can be used to store credentials used in your local scripts. Use Set-Secret to add'
+        if (Get-SecretVault -Name myCredentials) {
+            Write-Host 'Vault [myCredentials] can be used to store credentials used in your local scripts. Use Set-Secret to add'
+        } else {
+            Write-Warning "Vault [myCredentials] was not created"
+        }
     }
 } catch {
     Write-Warning "Issue creating scripts vault: $($_)"
