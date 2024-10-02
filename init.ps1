@@ -1,5 +1,6 @@
 #requires -Version 7.4
 #requires -Modules 'Microsoft.PowerShell.PSResourceGet'
+[CmdletBinding()]
 param(
     [switch]$NoK8s
 )
