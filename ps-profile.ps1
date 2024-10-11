@@ -81,7 +81,7 @@ Set-Alias -Name g -Value git
 Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
-Set-Alias -Name code -Value 'code-insiders'
+Set-Alias -Name ci -Value 'code-insiders'
 #endregion shortcuts
 
 #region functions
