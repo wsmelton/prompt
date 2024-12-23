@@ -15,7 +15,7 @@ Set-PSResourceRepository -Name PSGallery -Trusted
 
 if (-not (Get-Module ModuleFast)) {
     try {
-        iwr bit.ly/modulefast | iex
+        Invoke-WebRequest bit.ly/modulefast | Invoke-Expression
     } catch {
         throw "Issue installed dependency: ModuleFast: $($_)"
     }
@@ -40,8 +40,8 @@ if ($IsMacOS) {
         validate
         status
     #>
-    <# 
-        # bicep 
+    <#
+        # bicep
         brew tap azure/bicep
         brew install bicep
         brew install jq
@@ -60,7 +60,7 @@ if ($IsMacOS) {
     sudo mv ./kubectl /usr/local/bin/kubectl
     sudo chown root: /usr/local/bin/kubectl
     #>
-    
+
 }
 if (-not $IsMacOS) {
     <# Make sure Chocolatey is installed #>
