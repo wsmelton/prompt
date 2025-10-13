@@ -62,7 +62,7 @@ if (Get-Module Terminal-Icons -ListAvailable) {
     Import-Module Terminal-Icons
 }
 
-if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core' -and -not $IsMacOS)) {
+if ((Get-Module AzureAD -ListAvailable) -and ($PSEdition -eq 'Core' -and -not $IsMacOS)) {
     Import-Module AzureAD -UseWindowsPowerShell -WarningAction SilentlyContinue
 }
 
@@ -70,7 +70,7 @@ if ((Get-Module AzureAD -ListAvailable) -and ($psedition -eq 'Core' -and -not $I
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle ListView
 #endregion PSReadLine
 
-if ($psedition -ne 'Core' -and -not $IsMacOS) {
+if ($PSEdition -ne 'Core' -and -not $IsMacOS) {
     [System.Net.ServicePointManager]::SecurityProtocol = @('Tls12', 'Tls11', 'Tls', 'Ssl3')
 }
 
@@ -108,7 +108,7 @@ function GitLog {
 }
 if (-not $IsMacOS) {
     function myRdp {
-        [cmdletbinding()]
+        [CmdletBinding()]
         param (
             $server,
             [switch]$fullScreen
@@ -121,7 +121,7 @@ if (-not $IsMacOS) {
         }
     }
     function findAd {
-        [cmdletbinding()]
+        [CmdletBinding()]
         param(
             [Parameter(Position = 0, Mandatory)]
             [string]
