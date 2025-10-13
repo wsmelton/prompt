@@ -85,7 +85,6 @@ Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name ci -Value 'code-insiders'
-Set-Alias -Name ax -Value 'Select-AzContext'
 #endregion shortcuts
 
 #region functions
