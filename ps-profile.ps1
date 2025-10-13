@@ -26,7 +26,7 @@ try {
         Show-HistoryId
         New-TerminalBlock -Spacer
         Show-KubeContext -Prefix "🐳 " -DefaultForegroundColor WhiteSmoke -DefaultBackgroundColor DarkOrchid1
-        Show-AzureContext -Prefix "⛈️ " -DefaultForegroundColor DarkOrchid3 -DefaultBackgroundColor DarkGoldenrod1
+        Show-AzureContext -Prefix "⛈️  " -DefaultForegroundColor DarkOrchid3 -DefaultBackgroundColor DarkGoldenrod1 -
         Show-Path -HomeString "🏚️ " -Separator '\' -Depth 3
         New-TerminalBlock -Spacer
 
@@ -85,6 +85,7 @@ Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name ci -Value 'code-insiders'
+Set-Alias -Name ax -Value 'Select-AzContext'
 #endregion shortcuts
 
 #region functions
