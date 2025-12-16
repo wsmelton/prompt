@@ -99,7 +99,7 @@ function GitLog {
         [string]$FilePath
     )
     if ($FilePath) {
-        git log --pretty=oneline --all --full-history -- $FilePath
+        git log --pretty=oneline --all --abbrev-commit --full-history -- $FilePath
     }
     else {
         git log --pretty=oneline -$LineCount
