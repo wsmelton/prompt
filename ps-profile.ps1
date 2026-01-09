@@ -696,7 +696,8 @@ function Get-PodLogStern {
         # Pass in multiple vai single-stringed, comma-separated (e.g. 'running, waiting')
         # Pass in 'all' to get everything
         [Parameter(Position = 3)]
-        [string]$State = 'running',
+        [ValidateSet('running', 'waiting', 'terminated', 'all')]
+        [string]$State = 'all',
 
         # Output log data to JSON format
         [switch]$Output,
