@@ -681,12 +681,13 @@ function Get-PodLogStern {
     [Alias('kstern')]
     [CmdletBinding()]
     param(
+        # pod name
         [Parameter(Position = 0)]
-        [string]$Namespace,
+        [string]$PodName = ".*",
 
         # Pull logs since (use 2h, 5m, etc.). Default: 2h (2 hours)
         [Parameter(Position = 1)]
-        [string]$Since = '30m',
+        [string]$Since = '2h',
 
         # Include only lines container provided regular expression (e.g., "The file uploaded*")
         [Parameter(Position = 2)]
@@ -702,24 +703,24 @@ function Get-PodLogStern {
         # Output log data to JSON format
         [switch]$Output,
 
-        # Follow the logs for the namespace
-        [boolean]$EnableFollow
+        # Namespace is optional, defaults to context's namespace if not provided
+        [string]$Namespace
     )
-    if (kubectl krew info stern) {
+    if (k krew) {
         if ($Output) {
             if ($Include) {
-                kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json
+                k stern $PodName --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short --output=json
             }
             else {
-                k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json
+                k stern $PodName --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short --output=json
             }
         }
         else {
             if ($Include) {
-                kubectl stern ".*" --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short
+                k stern $PodName --namespace $Namespace --since $Since --include $Include --no-follow=true --container-state $State --color=always --timestamps=short
             }
             else {
-                k stern ".*" --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short
+                k stern $PodName --namespace $Namespace --since $Since --no-follow=true --container-state $State --color=always --timestamps=short
             }
         }
     }
