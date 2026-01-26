@@ -391,7 +391,7 @@ if (-not $IsMacOS) {
         if (Get-ADUser @adUserParams) { $true } else { $false }
     }
 }
-function findshit ($str, $path) {
+function findstuff ($str, $path) {
     $str = [regex]::escape($str)
     Select-String -Pattern $str -Path (Get-ChildItem $path -Recurse -Exclude 'allcommands.ps1', '*.dll', '*psproj')
 }
