@@ -135,7 +135,7 @@ if ($IsWindows) {
             choco install $font -y
         }
     }
-else {
+} else {
     foreach ($font in $fontsToInstall) {
         if (Get-Command brew) {
             foreach ($font in $fontsToInstall) {
