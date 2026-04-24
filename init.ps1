@@ -5,8 +5,8 @@ param(
     [switch]$NoK8s
 )
 $ErrorView = 'DetailedView'
-$fontsToInstall = @('CodeNewRoman', 'CascadiaMono', 'FiraMono', 'InconsolataGo', 'VictorMono', 'GeistMono')
-
+# Windows 11 didn't like the Nerd Font install script so sticking with choco packages
+$fontsToInstall = @('nerd-fonts-firamono','nerd-fonts-codenewroman', 'nerd-fonts-cascadiamono', 'nerd-fonts-inconsolatago', 'nerd-fonts-victormono', 'nerd-fonts-geistmono')
 if (-not $IsMacOS -and -not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
     throw "This script needs to be run As Admin"
 }
@@ -128,23 +128,19 @@ try {
 
 # setup nerd fonts using install.ps1 in ryanoasis/nerd-fonts repo
 #   shallow clone the repo and run the install script for each font we want
-if (Get-Command git) {
-    $nerdFontsPath = "$env:USERPROFILE\nerd-fonts"
-    if (-not (Test-Path (Join-Path $nerdFontsPath .git))) {
-        git clone --depth 1 https://github.com/ryanoasis/nerd-fonts.git $nerdFontsPath
-    }
-    $installScript = Join-Path -Path $nerdFontsPath -ChildPath "install.ps1"
-    if (Test-Path $installScript) {
-        if ($IsWindows) {
-            Write-Host "Installing Nerd Font(s): $fontsToInstall"
-            & $installScript $fontsToInstall
-        } else {
-            foreach ($font in $fontsToInstall) {
-                Write-Host "Installing Nerd Font(s): $font"
-                & $installScript $font
-            }
+if ($IsWindows) {
+    if (Get-Command choco) {
+        foreach ($font in $fontsToInstall) {
+            Write-Host "choco install $font"
+            choco install $font -y
         }
-    } else {
-        Write-Warning "Install script for font $font not found at path: $installScript"
+    }
+else {
+    foreach ($font in $fontsToInstall) {
+        if (Get-Command brew) {
+            foreach ($font in $fontsToInstall) {
+                Write-Host "brew install $font"
+                brew install $font -y
+            }
     }
 }
