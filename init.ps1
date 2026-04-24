@@ -142,5 +142,6 @@ else {
                 Write-Host "brew install $font"
                 brew install $font -y
             }
+        }
     }
 }
