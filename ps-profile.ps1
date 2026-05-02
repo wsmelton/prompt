@@ -81,11 +81,23 @@ if (Test-Path "$env:USERPROFILE\azure-context.json") {
 #region shortcuts
 Set-Alias -Name gsc -Value 'Get-Secret'
 Set-Alias -Name g -Value git
-Set-Alias -Name k -Value kubectl
 Set-Alias -Name kx -Value kubectx
 Set-Alias -Name kns -Value kubens
 Set-Alias -Name ci -Value 'code-insiders'
 #endregion shortcuts
+
+#region aliases for kubectl shortcuts
+
+<# alias for kubectl base #>
+function k() { & kubectl @args }
+
+<# alias for kube-system namespace #>
+function ks() { & kubectl -n kube-system @args}
+
+<# alias for kubectl logs, namespace as first argument #>
+function kl() { & kubectl logs -f -n $args[0] $args[1..$args.Length] }
+
+#endregion aliases for kubectl shortcuts
 
 #region functions
 function GitLog {
