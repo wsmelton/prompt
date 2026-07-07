@@ -87,9 +87,9 @@ Set-Alias -Name ci -Value 'code-insiders'
 #endregion shortcuts
 
 #region aliases for kubectl shortcuts
-
+Set-Alias -Name k -Value kubectl -Scope Global
 <# alias for kubectl base #>
-function k() { & kubectl @args }
+# function k() { & kubectl @args }
 
 <# alias for kube-system namespace #>
 function ks() { & kubectl -n kube-system @args}
