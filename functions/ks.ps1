@@ -1,0 +1,1 @@
+function ks() { & kubectl -n kube-system @args}

@@ -1,0 +1,1 @@
+function kl() { & kubectl logs -f -n $args[0] $args[1..$args.Length] }
